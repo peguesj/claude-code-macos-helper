@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleExecutable</key>
+    <string>ClaudeHelper</string>
+    <key>CFBundleIdentifier</key>
+    <string>io.pegues.ClaudeHelper</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>Claude Helper</string>
+    <key>CFBundleDisplayName</key>
+    <string>Claude Helper</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>15.0</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026 Jeremiah Pegues. MIT licensed.</string>
+    <key>NSSupportsAutomaticTermination</key>
+    <true/>
+    <key>NSSupportsSuddenTermination</key>
+    <true/>
+    <key>SUFeedURL</key>
+    <string>https://peguesj.github.io/claude-code-macos-helper/appcast.xml</string>
+    <key>SUEnableInstallerLauncherService</key>
+    <true/>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Claude Helper uses AppleScript to expose profile switching to automation tools.</string>
+</dict>
+</plist>
