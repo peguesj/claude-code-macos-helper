@@ -1,0 +1,6 @@
+2026-05-12 00:04:54,464 - __main__ - INFO - Cataloging project resources: /Users/jeremiah/tools/@yj/claude-code-macos-helper
+2026-05-12 00:04:54,464 - __main__ - INFO - Cataloging file resources
+2026-05-12 00:04:55,291 - __main__ - INFO - Cataloging directory structure
+2026-05-12 00:04:55,543 - __main__ - INFO - Cataloging dependencies
+2026-05-12 00:04:55,668 - __main__ - INFO - Cataloging API endpoints
+2026-05-12 00:04:55,877 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json
