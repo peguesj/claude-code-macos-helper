@@ -82,7 +82,7 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
 
     private func presentContextMenu(from sender: NSStatusBarButton) {
         let menu = NSMenu()
-        menu.addItem(.init(title: "Refresh now", action: #selector(refreshNow), keyEquivalent: "r")).target = self
+        menu.addItem(withTitle: "Refresh now", action: #selector(refreshNow), keyEquivalent: "r").target = self
         menu.addItem(.separator())
         for profile in profileStore.profiles {
             let item = NSMenuItem(title: profile.name, action: #selector(switchProfile(_:)), keyEquivalent: "")
@@ -92,8 +92,8 @@ final class StatusItemController: NSObject, NSPopoverDelegate {
             menu.addItem(item)
         }
         menu.addItem(.separator())
-        menu.addItem(.init(title: "Open Claude.ai usage", action: #selector(openUsage), keyEquivalent: "")).target = self
-        menu.addItem(.init(title: "Quit Claude Helper", action: #selector(quit), keyEquivalent: "q")).target = self
+        menu.addItem(withTitle: "Open Claude.ai usage", action: #selector(openUsage), keyEquivalent: "").target = self
+        menu.addItem(withTitle: "Quit Claude Helper", action: #selector(quit), keyEquivalent: "q").target = self
         statusItem.menu = menu
         sender.performClick(nil)
         statusItem.menu = nil

@@ -21,8 +21,8 @@ let package = Package(
                 .product(name: "GRDB", package: "GRDB.swift"),
             ],
             path: "Sources/ClaudeHelper",
+            exclude: ["Resources/Info.plist"],
             resources: [
-                .copy("Resources/Info.plist"),
                 .process("Resources/Assets.xcassets"),
             ]
         ),
