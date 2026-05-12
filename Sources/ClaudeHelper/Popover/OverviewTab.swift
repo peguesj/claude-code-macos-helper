@@ -57,9 +57,9 @@ struct OverviewTab: View {
 
     private func meterColor(_ ratio: Double) -> Color {
         switch ratio {
-        case ..<0.7: return .accentColor
-        case ..<0.9: return .orange
-        default:     return .red
+        case ..<0.7: return .claudeClay
+        case ..<0.9: return .claudeWarn
+        default:     return .claudeDanger
         }
     }
 }

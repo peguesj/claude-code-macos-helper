@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Claude Helper — see your Claude Code usage at a glance</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" href="assets/colors_and_type.css" />
+<style>
+  :root {
+    --ink:   #1d1d1f;
+    --ink-2: rgba(29,29,31,0.62);
+    --ink-3: rgba(29,29,31,0.32);
+    --line:  rgba(29,29,31,0.14);
+    --bg:    #faf9f6;
+    --paper: #ffffff;
+    --accent:#cc785c;
+    --accent-soft: rgba(204,120,92,0.10);
+    --warn:  #ff9500;
+    --danger:#ff3b30;
+    --ok:    #34c759;
+    --radius: 10px;
+    --shadow-1: 0 1px 0 rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
+    --shadow-2: 0 1px 0 rgba(0,0,0,0.04), 0 18px 48px rgba(0,0,0,0.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased; font-size: 16px; line-height: 1.55;
+  }
+  a { color: var(--ink); text-decoration: none; }
+  a:hover { color: var(--accent); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  /* Wireframe scaffolding language */
+  .wf-box      { border: 1px solid var(--line); background: white; border-radius: var(--radius); }
+  .wf-dashed   { border: 1px dashed var(--ink-3); background: rgba(0,0,0,0.015); border-radius: var(--radius); }
+  .wf-hatch {
+    background-image: repeating-linear-gradient(135deg, rgba(0,0,0,0.05) 0 1px, transparent 1px 8px);
+    border: 1px dashed var(--ink-3); border-radius: var(--radius);
+  }
+  .wf-line { display: block; height: 8px; background: rgba(0,0,0,0.08); border-radius: 4px; }
+  .wf-line.short { width: 38%; }
+  .wf-line.mid   { width: 64%; }
+  .wf-line.long  { width: 90%; }
+  .wf-stack > * + * { margin-top: 8px; }
+
+  /* Top nav */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(250,249,246,0.85);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner { height: 52px; display: flex; align-items: center; gap: 22px; }
+  .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; letter-spacing: -0.005em; }
+  .brand-mark { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; }
+  .nav-links { display: flex; gap: 18px; margin-left: 8px; }
+  .nav-links a { font-size: 13px; color: var(--ink-2); }
+  .nav-cta-group { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 12px; border-radius: 999px; font-size: 13px; font-weight: 500;
+    border: 1px solid var(--line); background: white; cursor: pointer; color: var(--ink);
+    transition: background 120ms, transform 120ms, border-color 120ms;
+  }
+  .btn:hover { border-color: var(--ink-3); }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+  .btn-primary:hover { background: #b96850; border-color: #b96850; color: white; }
+  .btn-ghost { background: transparent; border-color: transparent; }
+  .btn-ghost:hover { background: rgba(0,0,0,0.04); }
+
+  /* Hero */
+  .hero { padding: 96px 0 64px; }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 64px; align-items: center; }
+  @media (max-width: 880px) { .hero-grid { grid-template-columns: 1fr; gap: 40px; } }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--accent); padding: 4px 10px; border-radius: 999px;
+    background: var(--accent-soft);
+  }
+  .eyebrow-dot { width: 6px; height: 6px; border-radius: 999px; background: var(--accent); animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 0.4 } 50% { opacity: 1 } }
+  h1.headline {
+    font-size: clamp(40px, 5.4vw, 64px);
+    font-weight: 600; letter-spacing: -0.025em; line-height: 1.04;
+    margin: 18px 0 18px;
+  }
+  .headline .accent { color: var(--accent); }
+  .lede { font-size: 18px; line-height: 1.55; color: var(--ink-2); max-width: 520px; margin-bottom: 28px; }
+  .cta-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .install-line { margin-top: 18px; display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--ink-2); }
+  .install-line code {
+    background: white; border: 1px solid var(--line); padding: 5px 9px; border-radius: 6px;
+    font-size: 12px; color: var(--ink);
+  }
+  .copy-btn {
+    width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center;
+    background: white; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; color: var(--ink-2);
+  }
+  .copy-btn:hover { color: var(--ink); }
+
+  /* Hero illustration — animated menubar mock */
+  .hero-art { position: relative; min-height: 360px; }
+  .desktop-frame {
+    position: relative; width: 100%; height: 380px;
+    background: linear-gradient(180deg, #2b2b30, #1d1d20);
+    border-radius: 14px; border: 1px solid rgba(0,0,0,0.30);
+    box-shadow: var(--shadow-2);
+    overflow: hidden;
+  }
+  .desktop-menubar {
+    height: 26px; background: rgba(30,30,32,0.92);
+    backdrop-filter: blur(20px);
+    color: rgba(255,255,255,0.88);
+    display: flex; align-items: center; padding: 0 10px; gap: 14px;
+    font-size: 12px; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    border-bottom: 1px solid rgba(0,0,0,0.4);
+  }
+  .menubar-menu { opacity: 0.92; }
+  .menubar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .helper-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 8px; border-radius: 4px; background: rgba(255,255,255,0.10);
+    cursor: pointer;
+  }
+  .helper-pill .arc {
+    width: 14px; height: 14px; border-radius: 999px;
+    border: 2px solid var(--accent); border-right-color: transparent; transform: rotate(-45deg);
+  }
+  .helper-meters { display: inline-flex; gap: 4px; }
+  .helper-meter { width: 20px; height: 4px; border-radius: 999px; background: rgba(255,255,255,0.30); overflow: hidden; }
+  .helper-meter > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width 1.4s cubic-bezier(0.22,1,0.36,1); }
+  .helper-meter.warn > i { background: var(--warn); }
+  .helper-meter.danger > i { background: var(--danger); }
+
+  /* Animated popover */
+  .pop {
+    position: absolute; top: 36px; right: 18px;
+    width: 250px; height: 318px;
+    background: rgba(246,246,247,0.94);
+    backdrop-filter: blur(20px);
+    border-radius: 10px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    border: 1px solid rgba(0,0,0,0.10);
+    padding: 10px;
+    color: #1d1d1f;
+    opacity: 0; transform: translateY(-6px) scale(0.98); transform-origin: 90% 0;
+    animation: popIn 700ms cubic-bezier(0.22,1,0.36,1) 700ms forwards;
+  }
+  @keyframes popIn { to { opacity: 1; transform: translateY(0) scale(1); } }
+  .pop-header { display: flex; align-items: center; gap: 8px; padding: 4px 4px 8px; border-bottom: 1px solid rgba(0,0,0,0.08); }
+  .pop-arc { width: 16px; height: 16px; border-radius: 999px; border: 2px solid var(--accent); border-right-color: transparent; transform: rotate(-45deg); }
+  .pop-title { font-size: 13px; font-weight: 600; }
+  .pop-sub { font-size: 10px; color: rgba(0,0,0,0.55); }
+  .pop-tabs { display: flex; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.08); gap: 2px; }
+  .pop-tab { flex: 1; text-align: center; font-size: 9px; color: rgba(0,0,0,0.55); padding: 4px 0; border-radius: 4px; }
+  .pop-tab.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .pop-body { padding: 8px 4px; display: flex; flex-direction: column; gap: 10px; }
+  .pop-row { display: flex; flex-direction: column; gap: 3px; }
+  .pop-row-top { display: flex; font-size: 10px; }
+  .pop-row-top span:last-child { margin-left: auto; color: rgba(0,0,0,0.55); font-family: ui-monospace,monospace; }
+  .pop-track { height: 4px; background: rgba(0,0,0,0.10); border-radius: 999px; overflow: hidden; }
+  .pop-track > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width 1.6s cubic-bezier(0.22,1,0.36,1); }
+  .pop-track.warn > i { background: var(--warn); }
+  .pop-track.danger > i { background: var(--danger); }
+  .pop-spend { margin-top: 4px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.08); }
+  .pop-money { font-family: ui-rounded, "SF Pro Rounded", sans-serif; font-size: 22px; font-weight: 500; letter-spacing: -0.01em; }
+  .pop-flag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 999px; font-size: 9px; background: rgba(255,59,48,0.18); color: var(--danger); }
+
+  /* Sections */
+  section { padding: 72px 0; border-top: 1px solid var(--line); }
+  .section-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+  h2.section-title { font-size: clamp(28px, 3.4vw, 40px); font-weight: 600; letter-spacing: -0.02em; margin: 8px 0 0; line-height: 1.1; }
+  .section-lede { font-size: 17px; color: var(--ink-2); max-width: 620px; margin-top: 14px; }
+
+  /* Features grid */
+  .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 40px; }
+  @media (max-width: 880px) { .feature-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .feature-grid { grid-template-columns: 1fr; } }
+  .feature {
+    background: white; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px 18px 22px;
+    transition: transform 220ms cubic-bezier(0.22,1,0.36,1), box-shadow 220ms;
+    will-change: transform;
+  }
+  .feature:hover { transform: translateY(-3px); box-shadow: var(--shadow-1); }
+  .feature .visual { height: 90px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.03); border-radius: 6px; }
+  .feature h3 { font-size: 15px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .feature p  { font-size: 13px; color: var(--ink-2); margin: 0; }
+
+  /* Step list */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 44px; counter-reset: step; }
+  @media (max-width: 720px) { .steps { grid-template-columns: 1fr; } }
+  .step { position: relative; padding-top: 12px; counter-increment: step; }
+  .step::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: ui-monospace, monospace; font-size: 12px; color: var(--accent); letter-spacing: 0.06em;
+    display: block; margin-bottom: 8px;
+  }
+  .step h4 { font-size: 17px; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .step p  { font-size: 14px; color: var(--ink-2); margin: 0 0 16px; }
+  .step .frame {
+    aspect-ratio: 4 / 3; background: white; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 14px; box-shadow: var(--shadow-1); position: relative; overflow: hidden;
+  }
+
+  /* Alt content row */
+  .feat-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; padding: 56px 0;
+  }
+  .feat-row.reverse > .feat-visual { order: -1; }
+  @media (max-width: 880px) { .feat-row { grid-template-columns: 1fr; gap: 28px; } .feat-row.reverse > .feat-visual { order: 0; } }
+  .feat-content h3 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; margin: 8px 0 12px; line-height: 1.15; }
+  .feat-content p  { font-size: 16px; color: var(--ink-2); margin: 0; }
+  .feat-visual {
+    aspect-ratio: 5 / 4; background: white; border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px; box-shadow: var(--shadow-1); position: relative; overflow: hidden;
+  }
+
+  /* FAQ */
+  .faq-list { margin-top: 36px; border-top: 1px solid var(--line); }
+  .faq-item { border-bottom: 1px solid var(--line); }
+  .faq-q {
+    width: 100%; text-align: left; background: transparent; border: 0;
+    padding: 20px 0; font-size: 17px; font-weight: 500; letter-spacing: -0.01em;
+    display: flex; align-items: center; cursor: pointer; color: var(--ink);
+  }
+  .faq-q .chev { margin-left: auto; transition: transform 240ms; color: var(--ink-3); }
+  .faq-item[open] .chev { transform: rotate(45deg); color: var(--accent); }
+  .faq-a {
+    max-height: 0; overflow: hidden; transition: max-height 320ms cubic-bezier(0.22,1,0.36,1);
+    font-size: 15px; color: var(--ink-2);
+  }
+  .faq-item[open] .faq-a { max-height: 220px; }
+  .faq-a-inner { padding: 0 0 22px; }
+
+  /* Footer */
+  footer { padding: 56px 0 80px; border-top: 1px solid var(--line); }
+  .foot { display: flex; align-items: flex-start; gap: 40px; flex-wrap: wrap; }
+  .foot-cols { display: flex; gap: 56px; margin-left: auto; flex-wrap: wrap; }
+  .foot-col { display: flex; flex-direction: column; gap: 6px; }
+  .foot-col h5 { font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin: 0 0 4px; color: var(--ink-2); }
+  .foot-col a { font-size: 13px; color: var(--ink-2); }
+  .foot-col a:hover { color: var(--ink); }
+  .colophon { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--line); font-size: 12px; color: var(--ink-3); display: flex; gap: 16px; }
+  .colophon .mono { color: var(--ink-2); }
+
+  /* Reveal-on-scroll */
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity 600ms cubic-bezier(0.22,1,0.36,1), transform 600ms cubic-bezier(0.22,1,0.36,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* Tiny svg helpers */
+  .iconSlot { width: 22px; height: 22px; color: var(--ink-2); }
+</style>
+</head>
+<body>
+
+<!-- ────────── NAV ────────── -->
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#cc785c" stroke-width="2.2" stroke-linecap="round">
+          <path d="M 17.55 5.12 A 9 9 0 1 0 17.55 18.88" />
+        </svg>
+      </span>
+      Claude Helper
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-cta-group">
+      <a class="btn btn-ghost" href="#" aria-label="GitHub repository">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.6.5.5 5.6.5 12c0 5.1 3.3 9.4 7.8 11 .6.1.8-.2.8-.6v-2.2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.4-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2.9-.3 2-.4 3-.4s2.1.1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.1 0 4.5-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.8-5.8 7.8-11C23.5 5.6 18.4.5 12 .5Z"/></svg>
+        GitHub
+      </a>
+      <a class="btn btn-primary" href="#install">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Download
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ────────── HERO ────────── -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="eyebrow-dot"></span> v0.1 · macOS 13+</span>
+      <h1 class="headline">See your Claude Code usage <span class="accent">at a glance.</span></h1>
+      <p class="lede">A tiny menubar app that surfaces your context window, monthly limits, and spend forecast — without opening a browser tab.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#install">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+          Download for macOS
+        </a>
+        <a class="btn" href="#how">See how it works →</a>
+      </div>
+      <div class="install-line">
+        <span>or install via</span>
+        <code class="mono">brew install --cask claude-helper</code>
+        <button class="copy-btn" aria-label="Copy install command" onclick="copyText(this, 'brew install --cask claude-helper')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="desktop-frame">
+        <div class="desktop-menubar">
+          <span style="display:inline-flex;opacity:0.9"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 12.6c0-3 2.5-4.5 2.6-4.5-1.4-2-3.6-2.3-4.4-2.4-1.9-.2-3.6 1.1-4.6 1.1-1 0-2.4-1.1-3.9-1-2 0-3.9 1.2-4.9 3-2.1 3.7-.5 9.1 1.5 12.1 1 1.5 2.2 3.1 3.7 3 1.5-.1 2.1-1 3.9-1s2.3 1 3.9 1c1.6 0 2.6-1.5 3.6-3 1.1-1.7 1.6-3.4 1.6-3.5-.1 0-3-1.1-3-4.8z"/></svg></span>
+          <span class="menubar-menu" style="font-weight:600">Code</span>
+          <span class="menubar-menu">File</span>
+          <span class="menubar-menu">Edit</span>
+          <span class="menubar-menu">View</span>
+          <div class="menubar-right">
+            <span class="helper-pill">
+              <span class="arc"></span>
+              <span class="helper-meters">
+                <span class="helper-meter"><i style="width:42%"></i></span>
+                <span class="helper-meter warn"><i style="width:78%"></i></span>
+                <span class="helper-meter danger"><i style="width:94%"></i></span>
+              </span>
+            </span>
+            <span style="opacity:0.8">Tue 2:48 PM</span>
+          </div>
+        </div>
+
+        <!-- popover -->
+        <div class="pop" aria-hidden="true">
+          <div class="pop-header">
+            <span class="pop-arc"></span>
+            <div style="display:flex;flex-direction:column;gap:1px;">
+              <span class="pop-title">Claude Helper</span>
+              <span class="pop-sub">personal-max · Max 20×</span>
+            </div>
+          </div>
+          <div class="pop-tabs">
+            <span class="pop-tab active">Overview</span>
+            <span class="pop-tab">Profiles</span>
+            <span class="pop-tab">Limits</span>
+            <span class="pop-tab">Spend</span>
+            <span class="pop-tab">⋯</span>
+          </div>
+          <div class="pop-body">
+            <div class="pop-row">
+              <div class="pop-row-top"><span>Session</span><span>42 / 100</span></div>
+              <div class="pop-track"><i style="width:42%"></i></div>
+            </div>
+            <div class="pop-row">
+              <div class="pop-row-top"><span>All models</span><span>3.9M / 5M</span></div>
+              <div class="pop-track warn"><i style="width:78%"></i></div>
+            </div>
+            <div class="pop-row">
+              <div class="pop-row-top"><span>Sonnet only</span><span>1.88M / 2M</span></div>
+              <div class="pop-track danger"><i style="width:94%"></i></div>
+            </div>
+            <div class="pop-spend" style="display:flex;align-items:baseline;gap:8px;">
+              <span class="pop-money">$104.81</span>
+              <span class="pop-flag">Over limit</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ────────── AT A GLANCE / FEATURE GRID ────────── -->
+<section id="features">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="section-eyebrow">At a glance</span>
+      <h2 class="section-title">Everything you'd open six tabs for, in your menubar.</h2>
+      <p class="section-lede">Three meters tell you whether you can keep working, switch profiles, or need to slow down. Click for the full picture.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature reveal">
+        <div class="visual">
+          <!-- three live meters illustration -->
+          <div style="display:flex;gap:6px;">
+            <span class="helper-meter" style="width:32px;background:rgba(0,0,0,0.08)"><i style="width:42%;background:var(--accent)"></i></span>
+            <span class="helper-meter" style="width:32px;background:rgba(0,0,0,0.08)"><i style="width:78%;background:var(--warn)"></i></span>
+            <span class="helper-meter" style="width:32px;background:rgba(0,0,0,0.08)"><i style="width:94%;background:var(--danger)"></i></span>
+          </div>
+        </div>
+        <h3>Three-meter glance</h3>
+        <p>Session, monthly all-models, and Sonnet-only — color-coded the moment a threshold breaks.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="visual">
+          <div style="display:flex;flex-direction:column;gap:5px;width:120px;">
+            <div style="display:flex;align-items:center;gap:6px;background:rgba(204,120,92,0.10);padding:5px 7px;border-radius:6px;">
+              <span style="width:7px;height:7px;border-radius:999px;background:#cc785c;"></span><span style="font-size:10px;font-weight:600">personal-max</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.04);padding:5px 7px;border-radius:6px;">
+              <span style="width:7px;height:7px;border-radius:999px;background:#5e8def;"></span><span style="font-size:10px">team-anthropic</span>
+            </div>
+          </div>
+        </div>
+        <h3>Multiple profiles</h3>
+        <p>Hold any number of API keys + plans. Switch with a click; the menubar accent shifts so you always know which you're spending.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="visual">
+          <svg viewBox="0 0 120 60" width="120" height="60">
+            <defs><linearGradient id="g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#cc785c"/><stop offset="100%" stop-color="#cc785c" stop-opacity="0.4"/></linearGradient></defs>
+            <rect x="4"  y="40" width="8" height="16" rx="1.5" fill="url(#g1)"/>
+            <rect x="16" y="32" width="8" height="24" rx="1.5" fill="url(#g1)"/>
+            <rect x="28" y="38" width="8" height="18" rx="1.5" fill="url(#g1)"/>
+            <rect x="40" y="28" width="8" height="28" rx="1.5" fill="url(#g1)"/>
+            <rect x="52" y="22" width="8" height="34" rx="1.5" fill="url(#g1)"/>
+            <rect x="64" y="26" width="8" height="30" rx="1.5" fill="url(#g1)"/>
+            <rect x="76" y="18" width="8" height="38" rx="1.5" fill="url(#g1)"/>
+            <rect x="88" y="14" width="8" height="42" rx="1.5" fill="url(#g1)"/>
+            <rect x="100" y="8" width="8" height="48" rx="1.5" fill="url(#g1)"/>
+            <line x1="0" y1="14" x2="120" y2="14" stroke="#ff3b30" stroke-width="1" stroke-dasharray="3 3"/>
+          </svg>
+        </div>
+        <h3>Spend forecast</h3>
+        <p>Linear projection of your month-end total against the limit you set, so you spot a burn-rate problem on day six, not day twenty-eight.</p>
+      </div>
+      <div class="feature reveal">
+        <div class="visual">
+          <div style="display:flex;flex-direction:column;gap:4px;width:128px;font-size:10px;">
+            <div style="display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:white;padding:5px 7px;border-radius:6px;">
+              <span>Switch plan</span>
+              <span style="margin-left:auto;color:var(--ink-3)">↗</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:white;padding:5px 7px;border-radius:6px;">
+              <span>Spend limit</span>
+              <span style="margin-left:auto;color:var(--ink-3)">↗</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:white;padding:5px 7px;border-radius:6px;">
+              <span>Auto-reload</span>
+              <span style="margin-left:auto;color:var(--ink-3)">↗</span>
+            </div>
+          </div>
+        </div>
+        <h3>Deep links</h3>
+        <p>The bits Anthropic only exposes in the dashboard are one keyboard shortcut away — opened in your default browser, in the right account.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ────────── HOW IT WORKS ────────── -->
+<section id="how">
+  <div class="wrap">
+    <div class="reveal">
+      <span class="section-eyebrow">How it works</span>
+      <h2 class="section-title">Three steps. No backend.</h2>
+      <p class="section-lede">Claude Helper polls the same endpoints your terminal hits and renders them where you'll actually look.</p>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <h4>Add a profile</h4>
+        <p>Paste an API key. Helper stores it in the macOS Keychain — never on disk in plaintext, never on a server.</p>
+        <div class="frame">
+          <div style="font-size:11px;color:var(--ink-3);margin-bottom:8px;" class="mono">⌘ Add profile</div>
+          <div class="wf-stack">
+            <div class="wf-line short"></div>
+            <div class="wf-box" style="height:24px;padding:5px 8px;font-size:10px;color:var(--ink-3);" class="mono">personal-max</div>
+            <div class="wf-line short"></div>
+            <div class="wf-box" style="height:24px;padding:5px 8px;font-size:10px;color:var(--ink-3);" class="mono">sk-ant-***************</div>
+            <div style="display:flex;gap:6px;margin-top:10px;">
+              <div class="wf-dashed" style="height:24px;flex:1;"></div>
+              <div style="height:24px;padding:3px 12px;background:var(--accent);color:white;border-radius:6px;font-size:11px;display:inline-flex;align-items:center;">Save</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step reveal">
+        <h4>Helper polls quietly</h4>
+        <p>Every 60 seconds (configurable), the active profile's usage endpoints get pinged. Failures fall back to cached values.</p>
+        <div class="frame" style="display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 200 120" width="100%" style="max-width:240px;">
+            <circle cx="40" cy="60" r="14" fill="white" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="40" y="63" text-anchor="middle" font-size="11" fill="var(--ink-2)" font-family="ui-monospace,monospace">app</text>
+            <circle cx="160" cy="60" r="14" fill="white" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="160" y="63" text-anchor="middle" font-size="9" fill="var(--ink-2)" font-family="ui-monospace,monospace">api</text>
+            <path d="M 55 55 Q 100 30 145 55" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3 3" id="pollPath1"/>
+            <path d="M 145 65 Q 100 90 55 65" fill="none" stroke="var(--ink-3)" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <circle r="3" fill="var(--accent)">
+              <animateMotion dur="2.4s" repeatCount="indefinite" path="M 55 55 Q 100 30 145 55"/>
+            </circle>
+          </svg>
+        </div>
+      </div>
+      <div class="step reveal">
+        <h4>Glance, act, get back to work</h4>
+        <p>Yellow = slow down. Red = switch profiles or raise the limit. The popover opens to the action you need.</p>
+        <div class="frame" style="display:flex;align-items:flex-end;gap:6px;padding:18px;">
+          <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
+            <div class="wf-line short"></div>
+            <div style="display:flex;gap:6px;align-items:center;"><span class="helper-meter" style="width:40px;background:rgba(0,0,0,0.08)"><i style="width:42%;background:var(--accent)"></i></span><span style="font-size:11px;color:var(--ink-2)">42%</span></div>
+            <div style="display:flex;gap:6px;align-items:center;"><span class="helper-meter" style="width:40px;background:rgba(0,0,0,0.08)"><i style="width:78%;background:var(--warn)"></i></span><span style="font-size:11px;color:var(--ink-2)">78%</span></div>
+            <div style="display:flex;gap:6px;align-items:center;"><span class="helper-meter" style="width:40px;background:rgba(0,0,0,0.08)"><i style="width:94%;background:var(--danger)"></i></span><span style="font-size:11px;color:var(--ink-2)">94%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ────────── DEEP FEATURE 1 — multi-profile ────────── -->
+<section>
+  <div class="wrap">
+    <div class="feat-row">
+      <div class="feat-content reveal">
+        <span class="section-eyebrow">Profiles</span>
+        <h3>Keep work and personal Claude credentials cleanly separated.</h3>
+        <p>Each profile bundles an API key, a claude.ai web session, and the plan tier. The active profile colors the menubar arc so you always know which account is being charged for the next request.</p>
+      </div>
+      <div class="feat-visual reveal">
+        <div class="wf-stack">
+          <div style="display:flex;align-items:center;gap:8px;padding:10px;background:rgba(204,120,92,0.10);border-radius:8px;border:1px solid rgba(204,120,92,0.20);">
+            <span style="width:10px;height:10px;border-radius:999px;background:#cc785c;"></span>
+            <div style="display:flex;flex-direction:column;">
+              <span style="font-size:13px;font-weight:500">personal-max</span>
+              <span style="font-size:11px;color:var(--ink-2)">Max 20×</span>
+            </div>
+            <span style="margin-left:auto;font-size:9px;font-weight:700;color:#cc785c;background:rgba(204,120,92,0.18);padding:2px 6px;border-radius:999px;">ACTIVE</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:10px;background:white;border-radius:8px;border:1px solid var(--line);">
+            <span style="width:10px;height:10px;border-radius:999px;background:#5e8def;"></span>
+            <div style="display:flex;flex-direction:column;"><span style="font-size:13px;font-weight:500">team-anthropic</span><span style="font-size:11px;color:var(--ink-2)">Team</span></div>
+            <span style="margin-left:auto;font-size:12px;color:#007aff;">Activate</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:10px;background:white;border-radius:8px;border:1px solid var(--line);">
+            <span style="width:10px;height:10px;border-radius:999px;background:#34c759;"></span>
+            <div style="display:flex;flex-direction:column;"><span style="font-size:13px;font-weight:500">side-project</span><span style="font-size:11px;color:var(--ink-2)">Pro</span></div>
+            <span style="margin-left:auto;font-size:12px;color:#007aff;">Activate</span>
+          </div>
+          <div class="wf-dashed" style="height:36px;display:flex;align-items:center;justify-content:center;color:var(--ink-3);font-size:12px;">+ Add profile</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feat-row reverse">
+      <div class="feat-content reveal">
+        <span class="section-eyebrow">Spend</span>
+        <h3>A burn-rate forecast you can actually act on.</h3>
+        <p>Helper draws a linear projection from your month-to-date spend and your average daily run-rate. Cross the limit line on day six, and you'll see red on day seven — not when the invoice arrives.</p>
+      </div>
+      <div class="feat-visual reveal">
+        <div style="display:flex;align-items:flex-start;margin-bottom:12px;">
+          <div>
+            <div style="font-size:11px;color:var(--ink-2)">This month</div>
+            <div style="font-family:ui-rounded,sans-serif;font-size:28px;font-weight:500;letter-spacing:-0.01em;">$37.20</div>
+          </div>
+          <div style="margin-left:auto;text-align:right;">
+            <div style="font-size:11px;color:var(--ink-2)">Projected</div>
+            <div style="font-family:ui-rounded,sans-serif;font-size:18px;font-weight:500;color:var(--danger);">$104.81</div>
+          </div>
+        </div>
+        <svg viewBox="0 0 320 120" width="100%" height="120">
+          <defs><linearGradient id="bgrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#cc785c"/><stop offset="100%" stop-color="#cc785c" stop-opacity="0.4"/></linearGradient></defs>
+          <line x1="0" y1="40" x2="320" y2="40" stroke="#ff3b30" stroke-width="1" stroke-dasharray="4 4" opacity="0.55"/>
+          <text x="318" y="36" text-anchor="end" font-size="9" fill="#ff3b30" font-family="ui-monospace,monospace">limit $75</text>
+          <g>
+            <rect x="0"   y="98" width="10" height="14" rx="1.5" fill="url(#bgrad)"/>
+            <rect x="14"  y="92" width="10" height="20" rx="1.5" fill="url(#bgrad)"/>
+            <rect x="28"  y="96" width="10" height="16" rx="1.5" fill="url(#bgrad)"/>
+            <rect x="42"  y="88" width="10" height="24" rx="1.5" fill="url(#bgrad)"/>
+            <rect x="56"  y="82" width="10" height="30" rx="1.5" fill="url(#bgrad)"/>
+            <rect x="70"  y="78" width="10" height="34" rx="1.5" fill="url(#bgrad)"/>
+            <rect x="84"  y="72" width="10" height="40" rx="1.5" fill="url(#bgrad)"/>
+            <rect x="98"  y="74" width="10" height="38" rx="1.5" fill="url(#bgrad)"/>
+            <rect x="112" y="68" width="10" height="44" rx="1.5" fill="url(#bgrad)"/>
+            <rect x="126" y="60" width="10" height="52" rx="1.5" fill="url(#bgrad)"/>
+            <rect x="140" y="56" width="10" height="56" rx="1.5" fill="url(#bgrad)"/>
+            <rect x="154" y="50" width="10" height="62" rx="1.5" fill="url(#bgrad)"/>
+          </g>
+          <!-- projection -->
+          <path d="M 164 50 L 318 14" stroke="#ff3b30" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+          <circle cx="318" cy="14" r="3" fill="#ff3b30"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="feat-row">
+      <div class="feat-content reveal">
+        <span class="section-eyebrow">Notifications</span>
+        <h3>Quiet by default. Loud when it matters.</h3>
+        <p>Set a percentage — 80% by default — and Helper fires a single native macOS notification when you cross it. No menubar bouncing, no dock badges, no email.</p>
+      </div>
+      <div class="feat-visual reveal" style="background:linear-gradient(180deg,#2b2b30,#1d1d20);border-color:transparent;">
+        <div style="background:rgba(60,60,67,0.92);backdrop-filter:blur(20px);border-radius:14px;padding:14px;color:white;box-shadow:0 14px 30px rgba(0,0,0,0.5);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <div style="width:28px;height:28px;border-radius:6px;background:white;display:inline-flex;align-items:center;justify-content:center;">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#cc785c" stroke-width="2.2" stroke-linecap="round"><path d="M 17.55 5.12 A 9 9 0 1 0 17.55 18.88"/></svg>
+            </div>
+            <div style="display:flex;flex-direction:column;">
+              <span style="font-size:12px;font-weight:600">Claude Helper</span>
+              <span style="font-size:10px;color:rgba(255,255,255,0.55)">now</span>
+            </div>
+          </div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Spend at 80% of limit</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.75)">$60.04 of $75.00 this month · projected $104.81</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ────────── PRIVACY ────────── -->
+<section id="privacy" style="background:white;">
+  <div class="wrap" style="display:grid;grid-template-columns:1fr 1.2fr;gap:64px;align-items:center;">
+    <div class="reveal">
+      <span class="section-eyebrow">Privacy</span>
+      <h2 class="section-title" style="margin-bottom:14px;">Your keys never leave your Mac.</h2>
+      <p class="section-lede" style="margin-top:0;">No backend, no analytics, no telemetry endpoints. API keys live in the macOS Keychain. Helper talks to api.anthropic.com directly — and to nothing else.</p>
+    </div>
+    <div class="reveal">
+      <div class="wf-stack" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="wf-box" style="padding:18px;">
+          <div style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Keychain
+          </div>
+          <p style="font-size:13px;color:var(--ink-2);margin:0;">Stored alongside Safari passwords. Sandbox-restricted to Helper's bundle ID.</p>
+        </div>
+        <div class="wf-box" style="padding:18px;">
+          <div style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Open source
+          </div>
+          <p style="font-size:13px;color:var(--ink-2);margin:0;">MIT licensed. Build it yourself; verify the network calls.</p>
+        </div>
+        <div class="wf-box" style="padding:18px;">
+          <div style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18"/></svg>
+            No accounts
+          </div>
+          <p style="font-size:13px;color:var(--ink-2);margin:0;">No sign-up. No license server. Quit and uninstall in five seconds.</p>
+        </div>
+        <div class="wf-box" style="padding:18px;">
+          <div style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            Native
+          </div>
+          <p style="font-size:13px;color:var(--ink-2);margin:0;">SwiftUI + AppKit. ~6 MB on disk. ~30 MB of RAM. No Electron.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ────────── INSTALL ────────── -->
+<section id="install" style="text-align:center;">
+  <div class="wrap" style="max-width:720px;">
+    <span class="section-eyebrow">Install</span>
+    <h2 class="section-title">Up and running in under a minute.</h2>
+    <div style="margin:36px auto;display:flex;flex-direction:column;gap:10px;text-align:left;background:#1d1d1f;color:#e8e6e1;padding:20px 22px;border-radius:12px;font-family:ui-monospace,monospace;font-size:13px;line-height:1.7;">
+      <div><span style="color:rgba(232,230,225,0.40);user-select:none;">$ </span>brew install --cask claude-helper</div>
+      <div><span style="color:rgba(232,230,225,0.40);user-select:none;">$ </span>open -a "Claude Helper"</div>
+      <div style="color:rgba(232,230,225,0.55);">→ Click the menubar arc and add your first profile.</div>
+    </div>
+    <div class="cta-row" style="justify-content:center;">
+      <a class="btn btn-primary" href="#">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Download .dmg (universal)
+      </a>
+      <a class="btn" href="#">View on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<!-- ────────── FAQ ────────── -->
+<section id="faq">
+  <div class="wrap" style="max-width:820px;">
+    <div class="reveal">
+      <span class="section-eyebrow">FAQ</span>
+      <h2 class="section-title">Common questions.</h2>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary class="faq-q">Does this work with Claude Pro / Max / Team plans?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span></summary>
+        <div class="faq-a"><div class="faq-a-inner">Yes. Plan-tier (web) profiles use a claude.ai session cookie. API profiles use an Anthropic API key. You can mix and match.</div></div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Is my API key sent anywhere?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span></summary>
+        <div class="faq-a"><div class="faq-a-inner">Only to api.anthropic.com. Helper has no backend. The key sits in the macOS Keychain and is read by the app process at request time.</div></div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Is it open source?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span></summary>
+        <div class="faq-a"><div class="faq-a-inner">MIT-licensed on GitHub. The build is reproducible; CI publishes the same notarized .dmg as the website.</div></div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Why a menubar app instead of a CLI?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span></summary>
+        <div class="faq-a"><div class="faq-a-inner">A CLI tells you the truth only when you ask. The menubar tells you the moment you're about to do something expensive.</div></div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Windows / Linux?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span></summary>
+        <div class="faq-a"><div class="faq-a-inner">Not yet. The app is SwiftUI/AppKit. A cross-platform Tauri rewrite is on the wishlist — issues and PRs welcome.</div></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ────────── FOOTER ────────── -->
+<footer>
+  <div class="wrap foot">
+    <div style="max-width:280px;">
+      <div class="brand" style="font-size:15px;margin-bottom:6px;">
+        <span class="brand-mark">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#cc785c" stroke-width="2.2" stroke-linecap="round"><path d="M 17.55 5.12 A 9 9 0 1 0 17.55 18.88" /></svg>
+        </span>
+        Claude Helper
+      </div>
+      <p style="font-size:13px;color:var(--ink-2);margin:0;">An unofficial menubar companion for Claude Code, by the community.</p>
+    </div>
+    <div class="foot-cols">
+      <div class="foot-col">
+        <h5>Product</h5>
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#install">Download</a>
+      </div>
+      <div class="foot-col">
+        <h5>Source</h5>
+        <a href="#">GitHub</a>
+        <a href="#">Releases</a>
+        <a href="#">Issues</a>
+      </div>
+      <div class="foot-col">
+        <h5>About</h5>
+        <a href="#">Privacy</a>
+        <a href="#">License (MIT)</a>
+        <a href="#">Attribution</a>
+      </div>
+    </div>
+  </div>
+  <div class="wrap colophon">
+    <span>Not affiliated with Anthropic.</span>
+    <span class="mono" style="margin-left:auto;">v0.1.0 · built {build}</span>
+  </div>
+</footer>
+
+<script>
+  // copy install command
+  function copyText(btn, text) {
+    navigator.clipboard?.writeText(text);
+    const original = btn.innerHTML;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#cc785c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+    setTimeout(() => { btn.innerHTML = original; }, 1200);
+  }
+
+  // reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // FAQ toggle (browsers handle <details> natively, but trigger animation by toggling [open])
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      // let summary's default toggle happen
+    });
+  });
+
+  // build date
+  document.body.innerHTML = document.body.innerHTML.replace('{build}', new Date().toISOString().slice(0, 10));
+</script>
+
+</body>
+</html>

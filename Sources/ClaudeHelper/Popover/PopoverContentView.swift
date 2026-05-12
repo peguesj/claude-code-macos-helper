@@ -50,7 +50,7 @@ struct PopoverContentView: View {
         HStack(spacing: 10) {
             Image(systemName: "circle.dashed.inset.filled")
                 .font(.system(size: 22, weight: .regular))
-                .foregroundStyle(profileStore.activeProfile?.swiftUIAccent ?? Color.accentColor)
+                .foregroundStyle(profileStore.activeProfile?.swiftUIAccent ?? Color(red: 0.80, green: 0.47, blue: 0.36))
             VStack(alignment: .leading, spacing: 2) {
                 Text("Claude Helper").font(.headline)
                 if let profile = profileStore.activeProfile {
@@ -87,8 +87,8 @@ struct PopoverContentView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 6)
-                    .foregroundStyle(selectedTab == tab ? Color.accentColor : .secondary)
-                    .background(selectedTab == tab ? Color.accentColor.opacity(0.12) : .clear)
+                    .foregroundStyle(selectedTab == tab ? Color.claudeClay : .secondary)
+                    .background(selectedTab == tab ? Color.claudeClay.opacity(0.12) : .clear)
                 }
                 .buttonStyle(.borderless)
             }

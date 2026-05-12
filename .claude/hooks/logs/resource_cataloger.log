@@ -4,3 +4,63 @@
 2026-05-12 00:04:55,543 - __main__ - INFO - Cataloging dependencies
 2026-05-12 00:04:55,668 - __main__ - INFO - Cataloging API endpoints
 2026-05-12 00:04:55,877 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json
+2026-05-12 02:08:46,088 - __main__ - INFO - Cataloging project resources: /Users/jeremiah/tools/@yj/claude-code-macos-helper
+2026-05-12 02:08:46,088 - __main__ - INFO - Cataloging file resources
+2026-05-12 02:08:46,114 - __main__ - INFO - Cataloging project resources: /Users/jeremiah/tools/@yj/claude-code-macos-helper
+2026-05-12 02:08:46,114 - __main__ - INFO - Cataloging file resources
+2026-05-12 02:08:46,933 - __main__ - INFO - Cataloging project resources: /Users/jeremiah/tools/@yj/claude-code-macos-helper
+2026-05-12 02:08:46,933 - __main__ - INFO - Cataloging file resources
+2026-05-12 02:08:47,845 - __main__ - INFO - Cataloging directory structure
+2026-05-12 02:08:47,845 - __main__ - INFO - Cataloging directory structure
+2026-05-12 02:08:48,295 - __main__ - INFO - Cataloging directory structure
+2026-05-12 02:08:48,720 - __main__ - INFO - Cataloging dependencies
+2026-05-12 02:08:48,772 - __main__ - INFO - Cataloging dependencies
+2026-05-12 02:08:49,046 - __main__ - INFO - Cataloging API endpoints
+2026-05-12 02:08:49,047 - __main__ - INFO - Cataloging API endpoints
+2026-05-12 02:08:49,088 - __main__ - INFO - Cataloging dependencies
+2026-05-12 02:08:49,386 - __main__ - INFO - Cataloging API endpoints
+2026-05-12 02:08:49,946 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json
+2026-05-12 02:08:50,028 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json
+2026-05-12 02:08:50,742 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json
+2026-05-12 02:09:20,028 - __main__ - INFO - Cataloging project resources: /Users/jeremiah/tools/@yj/claude-code-macos-helper
+2026-05-12 02:09:20,029 - __main__ - INFO - Cataloging file resources
+2026-05-12 02:09:20,077 - __main__ - INFO - Cataloging project resources: /Users/jeremiah/tools/@yj/claude-code-macos-helper
+2026-05-12 02:09:20,077 - __main__ - INFO - Cataloging file resources
+2026-05-12 02:09:22,285 - __main__ - INFO - Cataloging directory structure
+2026-05-12 02:09:22,288 - __main__ - INFO - Cataloging directory structure
+2026-05-12 02:09:22,860 - __main__ - INFO - Cataloging dependencies
+2026-05-12 02:09:22,861 - __main__ - INFO - Cataloging dependencies
+2026-05-12 02:09:23,082 - __main__ - INFO - Cataloging API endpoints
+2026-05-12 02:09:23,086 - __main__ - INFO - Cataloging API endpoints
+2026-05-12 02:09:23,696 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json
+2026-05-12 02:09:23,721 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json
+2026-05-12 03:01:31,576 - __main__ - INFO - Cataloging project resources: /Users/jeremiah/tools/@yj/claude-code-macos-helper
+2026-05-12 03:01:31,578 - __main__ - INFO - Cataloging file resources
+2026-05-12 03:01:32,844 - __main__ - INFO - Cataloging directory structure
+2026-05-12 03:01:33,173 - __main__ - INFO - Cataloging dependencies
+2026-05-12 03:01:33,309 - __main__ - INFO - Cataloging API endpoints
+2026-05-12 03:01:33,868 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json
+2026-05-12 03:22:32,768 - __main__ - INFO - Cataloging project resources: /Users/jeremiah/tools/@yj/claude-code-macos-helper
+2026-05-12 03:22:32,769 - __main__ - INFO - Cataloging file resources
+2026-05-12 03:22:34,077 - __main__ - INFO - Cataloging directory structure
+2026-05-12 03:22:34,432 - __main__ - INFO - Cataloging dependencies
+2026-05-12 03:22:35,062 - __main__ - INFO - Cataloging API endpoints
+2026-05-12 03:22:35,685 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json
+2026-05-12 04:06:20,525 - __main__ - INFO - Cataloging project resources: /Users/jeremiah/tools/@yj/claude-code-macos-helper
+2026-05-12 04:06:20,525 - __main__ - INFO - Cataloging file resources
+2026-05-12 04:06:21,345 - __main__ - INFO - Cataloging directory structure
+2026-05-12 04:06:21,638 - __main__ - INFO - Cataloging dependencies
+2026-05-12 04:06:21,750 - __main__ - INFO - Cataloging API endpoints
+2026-05-12 04:06:22,299 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json
+2026-05-12 04:06:32,246 - __main__ - INFO - Cataloging project resources: /Users/jeremiah/tools/@yj/claude-code-macos-helper
+2026-05-12 04:06:32,246 - __main__ - INFO - Cataloging file resources
+2026-05-12 04:06:32,828 - __main__ - INFO - Cataloging directory structure
+2026-05-12 04:06:33,114 - __main__ - INFO - Cataloging dependencies
+2026-05-12 04:06:33,262 - __main__ - INFO - Cataloging API endpoints
+2026-05-12 04:06:33,952 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json
+2026-05-12 04:06:47,411 - __main__ - INFO - Cataloging project resources: /Users/jeremiah/tools/@yj/claude-code-macos-helper
+2026-05-12 04:06:47,411 - __main__ - INFO - Cataloging file resources
+2026-05-12 04:06:48,009 - __main__ - INFO - Cataloging directory structure
+2026-05-12 04:06:48,260 - __main__ - INFO - Cataloging dependencies
+2026-05-12 04:06:48,377 - __main__ - INFO - Cataloging API endpoints
+2026-05-12 04:06:49,050 - __main__ - INFO - Resource cataloging completed: /Users/jeremiah/tools/@yj/claude-code-macos-helper/.claude/hooks/data/resource_catalog.json

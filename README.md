@@ -2,17 +2,31 @@
 
 # Claude Helper
 
-**A macOS menubar companion for managing Claude usage, profiles, and spend.**
+**An unofficial macOS menubar companion for Claude Code.** Three live usage meters at a glance, multi-profile switcher with per-profile claude.ai session isolation, local spend ledger, and deep-links to the settings pages Anthropic doesn't expose via API.
 
-[![Release](https://img.shields.io/github/v/release/peguesj/claude-code-macos-helper?display_name=tag&sort=semver&color=cc785c)](https://github.com/peguesj/claude-code-macos-helper/releases/latest)
-[![Build](https://img.shields.io/github/actions/workflow/status/peguesj/claude-code-macos-helper/ci.yml?branch=main&label=build)](https://github.com/peguesj/claude-code-macos-helper/actions)
-[![Swift](https://img.shields.io/badge/swift-6.0-F05138.svg?logo=swift)](https://swift.org)
-[![Platform](https://img.shields.io/badge/platform-macOS%2015%2B-lightgrey.svg?logo=apple)](https://www.apple.com/macos/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/peguesj/claude-code-macos-helper?color=blue)](https://github.com/peguesj/claude-code-macos-helper/commits/main)
-[![Health](https://img.shields.io/endpoint?url=https%3A%2F%2Fpeguesj.github.io%2Fclaude-code-macos-helper%2Fhealth.json)](https://peguesj.github.io/claude-code-macos-helper/)
+<p>
+  <a href="https://github.com/peguesj/claude-code-macos-helper/releases/latest"><img alt="release" src="https://img.shields.io/github/v/release/peguesj/claude-code-macos-helper?display_name=tag&sort=semver&color=cc785c&style=flat-square&logo=github"></a>
+  <a href="https://github.com/peguesj/claude-code-macos-helper/actions/workflows/ci.yml"><img alt="build" src="https://img.shields.io/github/actions/workflow/status/peguesj/claude-code-macos-helper/ci.yml?branch=main&label=build&style=flat-square&logo=githubactions&logoColor=white"></a>
+  <a href="https://github.com/peguesj/claude-code-macos-helper/actions/workflows/pages.yml"><img alt="pages" src="https://img.shields.io/github/actions/workflow/status/peguesj/claude-code-macos-helper/pages.yml?branch=main&label=pages&style=flat-square&logo=github"></a>
+  <img alt="swift" src="https://img.shields.io/badge/swift-6.0-F05138.svg?style=flat-square&logo=swift">
+  <img alt="platform" src="https://img.shields.io/badge/platform-macOS%2015%2B-lightgrey.svg?style=flat-square&logo=apple">
+  <a href="LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square"></a>
+  <a href="https://github.com/peguesj/claude-code-macos-helper/commits/main"><img alt="last commit" src="https://img.shields.io/github/last-commit/peguesj/claude-code-macos-helper?color=blue&style=flat-square&logo=git&logoColor=white"></a>
+  <img alt="code size" src="https://img.shields.io/github/languages/code-size/peguesj/claude-code-macos-helper?style=flat-square">
+</p>
 
-![Menubar closeup — Claude icon next to three live usage meters](docs/screenshots/menubar-closeup.png)
+<p>
+  <img alt="appkit" src="https://img.shields.io/badge/AppKit-NSStatusItem-black?style=flat-square&logo=apple&logoColor=white">
+  <img alt="swiftui" src="https://img.shields.io/badge/SwiftUI-popover-CC785C?style=flat-square">
+  <img alt="webkit" src="https://img.shields.io/badge/WebKit-WKWebsiteDataStore-007AFF?style=flat-square">
+  <img alt="grdb" src="https://img.shields.io/badge/GRDB-SQLite-3F8E5B?style=flat-square&logo=sqlite&logoColor=white">
+  <img alt="sparkle" src="https://img.shields.io/badge/Sparkle-2.x-FFB000?style=flat-square">
+  <img alt="keychain" src="https://img.shields.io/badge/secrets-Keychain-1D1D1F?style=flat-square&logo=applekeynote&logoColor=white">
+</p>
+
+![Menubar — Claude C-arc plus three live usage meters](docs/screenshots/menubar-closeup.png)
+
+[**Marketing site →**](https://peguesj.github.io/claude-code-macos-helper/) &nbsp;·&nbsp; [**Releases →**](https://github.com/peguesj/claude-code-macos-helper/releases) &nbsp;·&nbsp; [**Issues →**](https://github.com/peguesj/claude-code-macos-helper/issues)
 
 </div>
 
@@ -24,71 +38,90 @@
 - [Features](#features)
 - [Screenshots](#screenshots)
 - [Install](#install)
-- [Configure](#configure)
+  - [From release (recommended)](#from-release-recommended)
+  - [Gatekeeper note (no Apple Dev account)](#gatekeeper-note-no-apple-dev-account)
+- [How it bootstraps](#how-it-bootstraps)
 - [Profiles & session switching](#profiles--session-switching)
 - [Architecture](#architecture)
 - [Build from source](#build-from-source)
+- [Project layout](#project-layout)
 - [Releases & auto-update](#releases--auto-update)
-- [Roadmap](#roadmap)
 - [Contributing](#contributing)
+- [Roadmap](#roadmap)
 - [License](#license)
 
 ## Why
 
-You have a Claude Max plan **and** a Team workspace. You hit the session limit on one, want to flip to the other, glance at how much Sonnet you have left this window, and maybe nudge your auto-reload budget — all without leaving your editor. The official tools are great but they're cloud-only, and there's no at-a-glance ambient surface.
+You have a Claude Max plan **and** a Team workspace. You hit the session cap on one, want to flip to the other, glance at how much Sonnet you have left this window, and maybe nudge your auto-reload budget — all without leaving your editor. The official tools are great but cloud-only, and there's no ambient surface.
 
-Claude Helper lives in your menubar. It shows three live meters at all times, holds multiple Claude profiles (each with its own API key, claude.ai session, and CLI config), and deep-links you to the right place when an account-level setting needs the web console.
+Claude Helper lives in your menubar. It shows three live meters at all times, holds multiple Claude profiles (each with its own API key or OAuth token, claude.ai cookie isolation, and CLI config), and deep-links you to the right place when an account-level setting needs the web console.
 
 ## Features
 
-- **Three inline usage meters** — session, all-models, sonnet-only — visible at a glance next to the Claude icon.
-- **Multi-profile switcher** — Max personal, Team org, sandbox, whatever you need. Switching swaps the active API key (`ANTHROPIC_API_KEY`), the claude.ai web session cookies, and the local `~/.claude/settings.json` profile.
-- **Session capture & restore** — log into claude.ai once per profile; subsequent switches restore cookies without re-auth.
-- **Spend ledger** — GRDB/SQLite store with daily aggregates and linear forecast to month-end. Notification when projected spend crosses 80% of your limit.
-- **Deep links to claude.ai settings** — plan, billing, spend limit, auto-reload — opened in your default browser with the right path.
-- **AppleScript bridge** — automate profile switching from Shortcuts, Hammerspoon, or shell scripts.
-- **Sparkle auto-updates** — EdDSA-signed appcast, in-app update prompts.
-- **No keychain reuse** — each profile's secrets live in its own keychain item, scoped to bundle ID and profile UUID.
+- **Three inline meters** — session / all-models / sonnet — visible at a glance next to a Claude C-arc icon.
+- **Multi-profile switcher** — Max personal, Team org, sandbox. Switching swaps the active API key, the claude.ai cookies, and the local `~/.claude/settings.json` profile atomically.
+- **Auto-bootstrap on first launch** — reads `~/.claude/settings.json`, then `ANTHROPIC_API_KEY`, then the macOS Keychain `Claude Code-credentials` (OAuth) item, creating a "Default" profile if any are present.
+- **Session capture & restore** — sign into claude.ai once per profile; subsequent switches restore cookies without re-auth via `WKWebsiteDataStore`.
+- **Spend ledger** — GRDB / SQLite store, daily aggregates, linear month-end forecast. UserNotifications alert when the projection crosses 80% of your monthly limit.
+- **Deep links** — buttons that open the right claude.ai settings page in your default browser, scoped to the active profile's session.
+- **Sparkle auto-updates** — EdDSA-signed appcast.
+- **AppleScript bridge** — automate profile switching from Shortcuts, Hammerspoon, shell scripts (`v0.1.1+`).
+- **No keychain reuse** — each profile's secrets live under their own service tag, scoped to the bundle ID + profile UUID.
 
 ## Screenshots
 
-| Menubar | Overview | Profiles | Spend |
-|---|---|---|---|
-| ![](docs/screenshots/menubar-closeup.png) | ![](docs/screenshots/popover-overview.png) | ![](docs/screenshots/popover-profiles.png) | ![](docs/screenshots/popover-spend.png) |
+| Menubar | Overview | Profiles | Limits | Spend |
+|---|---|---|---|---|
+| ![](docs/screenshots/menubar-closeup.png) | ![](docs/screenshots/popover-overview.png) | ![](docs/screenshots/popover-profiles.png) | ![](docs/screenshots/popover-limits.png) | ![](docs/screenshots/popover-spend.png) |
+
+> Screenshots are auto-generated by the in-app harness (`make screenshots`) — they reflect the current build's actual rendering, not Figma mocks.
 
 ## Install
 
 ### From release (recommended)
 
 ```bash
-# Download the latest release
-gh release download --repo peguesj/claude-code-macos-helper \
-  --pattern 'ClaudeHelper-*.zip'
+# Download the latest universal .app
+gh release download --repo peguesj/claude-code-macos-helper --pattern 'ClaudeHelper-*.zip'
 
 unzip ClaudeHelper-*.zip
 mv ClaudeHelper.app /Applications/
+xattr -dr com.apple.quarantine /Applications/ClaudeHelper.app   # see Gatekeeper note
 open /Applications/ClaudeHelper.app
 ```
 
-### From source
+### Gatekeeper note (no Apple Dev account)
+
+This project is **ad-hoc signed** because the maintainer doesn't run an Apple Developer account. macOS Gatekeeper will refuse to open it on first launch with "Apple could not verify ClaudeHelper is free of malware." That's expected for unsigned apps.
+
+Two paths to open it:
 
 ```bash
-git clone https://github.com/peguesj/claude-code-macos-helper.git
-cd claude-code-macos-helper
-make install
+# Option A — strip the quarantine attribute (fastest)
+xattr -dr com.apple.quarantine /Applications/ClaudeHelper.app
+open /Applications/ClaudeHelper.app
 ```
 
-Requires macOS 15+, Xcode 16+, Swift 6.
+```text
+# Option B — right-click "Open" through Finder
+1. Right-click ClaudeHelper.app in /Applications
+2. Choose "Open" (NOT double-click)
+3. Click "Open" in the warning dialog — macOS remembers your choice
+```
 
-## Configure
+Source-built copies (`make install`) skip the quarantine bit entirely because they aren't downloaded from the internet.
 
-On first launch Claude Helper creates `~/Library/Application Support/ClaudeHelper/` and walks you through adding your first profile:
+## How it bootstraps
 
-1. Name the profile (e.g. `personal-max`)
-2. Paste an Anthropic API key (stored in Keychain, never on disk)
-3. Optionally sign in to claude.ai inside the embedded `WKWebView` to capture session cookies
+On first launch, Claude Helper looks for credentials in this order and creates a "Default" profile from the first one it finds:
 
-Subsequent profiles are added the same way. The active profile shows as a chip in the popover header.
+1. `~/.claude/settings.json` → `env.ANTHROPIC_API_KEY`
+2. `ANTHROPIC_API_KEY` environment variable
+3. macOS Keychain item `Claude Code-credentials` (the OAuth token Claude Code Max plans use; service `Claude Code-credentials`, JSON body with `claudeAiOauth.accessToken`)
+
+If none are found, the popover shows an empty "Add your first profile" state. Adding manually accepts any `sk-ant-…` key or OAuth bearer.
+
+> **Keychain ACL note:** the OAuth keychain item is ACL-restricted to the Claude Code CLI's signing identity. When Claude Helper (different signing identity) tries to read it, macOS will surface a keychain access prompt on first run. Approve once and the bootstrap completes; deny and the popover shows the empty state until you add a profile manually.
 
 ## Profiles & session switching
 
@@ -96,67 +129,149 @@ A **profile** bundles three things:
 
 | Thing | Lives in | Scope |
 |---|---|---|
-| Anthropic API key | Keychain (`io.pegues.ClaudeHelper.<profile-uuid>`) | API calls + telemetry |
-| claude.ai cookies | `WKWebsiteDataStore` per profile | Web console sessions |
+| Anthropic credential (API key or OAuth access token) | Keychain (`io.pegues.ClaudeHelper.<profile-uuid>`) | API calls + telemetry |
+| claude.ai cookies | `WKWebsiteDataStore(forIdentifier: profileUUID)` | Web console sessions |
 | CLI config | `~/.claude/settings.json` (rewritten on switch) | `claude` CLI usage |
 
-When you switch profiles the helper:
+When you switch profiles:
 
-1. Loads the target profile's secrets from Keychain
-2. Updates the `env.ANTHROPIC_API_KEY` block in `~/.claude/settings.json` (atomic write)
-3. Activates the target profile's `WKWebsiteDataStore` so any embedded claude.ai webview uses those cookies
-4. Posts a `ClaudeHelperProfileChanged` distributed notification (so any listening shells/scripts can re-source env)
+1. Active profile's secrets are loaded from Keychain.
+2. `env.ANTHROPIC_API_KEY` in `~/.claude/settings.json` is rewritten atomically (`tmp` + `rename(2)`).
+3. The target profile's `WKWebsiteDataStore` activates so any embedded claude.ai webview uses those cookies.
+4. `ClaudeHelperProfileChanged` distributed notification posts so listening shells/scripts can re-source env.
 
 ## Architecture
 
 ```
-┌────────────────────────────────────────────────────────────┐
-│ NSStatusItem (custom NSView)                               │
-│   ├── Claude C-icon (NSImage, template)                    │
-│   └── 3 inline meters (session / all-models / sonnet)      │
-│           ▲                                                │
-│           │ TelemetryService.published                     │
-│           │                                                │
-│ ┌─────────┴────────────────────────────────────────┐       │
-│ │ NSPopover (SwiftUI content)                      │       │
-│ │   Tabs: Overview / Profiles / Limits / Spend /   │       │
-│ │         Settings                                 │       │
-│ └────┬──────────────┬────────────┬─────────────────┘       │
-│      │              │            │                         │
-│  ProfileStore   SpendLedger   DeepLinks                    │
-│   │  │  │       (GRDB)       (NSWorkspace.open)            │
-│   │  │  └─ SessionStore (WKWebsiteDataStore per profile)   │
-│   │  └──── CLIConfigWriter (~/.claude/settings.json)       │
-│   └─────── Keychain (one item per profile)                 │
-│      │                                                     │
-│ ┌────▼──────────────────────────────────────────┐          │
-│ │ TelemetryService (actor, 60s poll)            │          │
-│ │   AnthropicUsageClient                        │          │
-│ │     ├ /v1/organizations/usage_report/messages │          │
-│ │     └ /v1/organizations/cost_report           │          │
-│ └───────────────────────────────────────────────┘          │
-└────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│ NSStatusItem (custom NSView, 22 pt tall)                      │
+│   ├── Claude C-arc icon (NSBezierPath, 16 pt)                 │
+│   └── 3 inline horizontal capsule meters (28×5 pt each)       │
+│        ▲                                                      │
+│        │ @Published TelemetrySnapshot                         │
+│ ┌──────┴─────────────────────────────────────────────┐        │
+│ │ NSPopover (SwiftUI content, 420×520 pt)            │        │
+│ │   Header • Tabs (Overview / Profiles / Limits /    │        │
+│ │           Spend / Settings) • Body                 │        │
+│ └─┬──────────────┬────────────┬────────────────────┬─┘        │
+│   │              │            │                    │          │
+│ ProfileStore  SpendLedger  DeepLinks         UpdaterBridge    │
+│  │ │ │       (GRDB)       (NSWorkspace)      (Sparkle 2.x)    │
+│  │ │ └── SessionStore (WKWebsiteDataStore per profile UUID)   │
+│  │ └──── CLIConfigWriter (~/.claude/settings.json atomic)     │
+│  └────── Keychain (one item per profile)                      │
+│  ▲                                                            │
+│ ProfileBootstrap (first-launch credential discovery)          │
+│                                                               │
+│ ┌─────────────────────────────────────────────────┐           │
+│ │ TelemetryService (actor, 60 s poll)             │           │
+│ │  AnthropicUsageClient                           │           │
+│ │    ├ /v1/organizations/usage_report/messages    │           │
+│ │    └ /v1/organizations/cost_report              │           │
+│ │  └→ writes samples to SpendLedger               │           │
+│ └─────────────────────────────────────────────────┘           │
+│ ┌─────────────────────────────────────────────────┐           │
+│ │ Forecaster — linear extrapolation,              │           │
+│ │  posts UNUserNotificationCenter alerts          │           │
+│ │  when projection crosses 0.5 → 0.8 → 1.0 limit  │           │
+│ └─────────────────────────────────────────────────┘           │
+└───────────────────────────────────────────────────────────────┘
 ```
 
-The whole app is one SPM executable target packaged into a `.app` bundle by `scripts/build-app.sh`. No `.xcodeproj` checked in — open with `xed .` if you want Xcode tooling.
+The entire app is **one SPM executable target** packaged into a `.app` bundle by `scripts/build-app.sh`. No `.xcodeproj` is checked in — open with `xed .` if you want Xcode tooling.
 
 ## Build from source
 
+**Prerequisites**: macOS 15+, Xcode 16+, Swift 6.0, GNU make.
+
 ```bash
-make build          # debug
-make run            # run debug binary
-make app CONFIG=release   # produce dist/ClaudeHelper.app
-make test
-make screenshots    # render docs/screenshots/*.png from popover state
+git clone https://github.com/peguesj/claude-code-macos-helper.git
+cd claude-code-macos-helper
+
+make build              # debug binary at .build/debug/ClaudeHelper
+make run                # run debug binary
+make app CONFIG=release # build .app at dist/ClaudeHelper.app
+make test               # XCTest suite
+make screenshots        # render docs/screenshots/*.png from popover state
+make install            # build + copy to /Applications + launch
+```
+
+If you don't have an Apple Developer ID (most contributors won't), the `.app` is ad-hoc signed by `codesign --force --deep --sign -`. Gatekeeper still flags it for downloaded copies — see [Gatekeeper note](#gatekeeper-note-no-apple-dev-account).
+
+To work in Xcode:
+
+```bash
+xed .                   # opens Package.swift in Xcode
+# Build & Run with Cmd-R
+```
+
+## Project layout
+
+```
+claude-code-macos-helper/
+├── Package.swift                       # SPM manifest, macOS 15 / Swift 6
+├── Sources/ClaudeHelper/
+│   ├── App.swift                       # @main, NSApplication setup
+│   ├── AppDelegate.swift               # status item + popover wiring
+│   ├── Menubar/
+│   │   ├── StatusItemController.swift  # NSStatusItem owner + context menu
+│   │   └── MenubarMeterView.swift      # custom NSView: C-arc + 3 meters
+│   ├── Popover/
+│   │   ├── PopoverContentView.swift    # SwiftUI tab container
+│   │   ├── OverviewTab.swift           # three labeled meters + forecast
+│   │   ├── ProfilesTab.swift           # list + add-profile sheet
+│   │   ├── LimitsTab.swift             # deep-link rows
+│   │   ├── SpendTab.swift              # Swift Charts bar chart
+│   │   └── SettingsTab.swift           # AppStorage-backed prefs
+│   ├── Models/
+│   │   ├── UsageMeter.swift            # TelemetryMeter, TelemetrySnapshot
+│   │   ├── Plan.swift                  # Plan.Kind enum
+│   │   └── Profile.swift               # Profile struct + NSColor(hex:)
+│   ├── Services/
+│   │   ├── TelemetryService.swift      # @MainActor, 60s poll
+│   │   ├── AnthropicUsageClient.swift  # actor, URLSession + stub fallback
+│   │   ├── KeychainHelper.swift        # generic-password CRUD
+│   │   ├── ProfileStore.swift          # ObservableObject, persistence
+│   │   ├── ProfileBootstrap.swift      # first-launch credential discovery
+│   │   ├── SessionStore.swift          # per-profile WKWebsiteDataStore
+│   │   ├── CLIConfigWriter.swift       # atomic ~/.claude/settings.json
+│   │   ├── SpendLedger.swift           # GRDB usage_samples table
+│   │   └── Forecaster.swift            # alerts via UNUserNotificationCenter
+│   └── Util/
+│       ├── BrandColors.swift           # design token → SwiftUI Color
+│       ├── DeepLinks.swift             # NSWorkspace.open shortcuts
+│       ├── Logging.swift               # os.Logger wrapper
+│       ├── NotificationDispatcher.swift
+│       ├── UpdaterBridge.swift         # Sparkle, LaunchAtLogin
+│       ├── ScreenshotRenderer.swift    # CLAUDEHELPER_SCREENSHOT_MODE=1
+│       └── Bundle+Version.swift
+├── Tests/ClaudeHelperTests/            # XCTest suite (ratio math, hex, deep-links)
+├── scripts/
+│   ├── build-app.sh                    # SPM build → .app bundle + Sparkle.framework
+│   └── release.sh                      # tag + gh release with artifact
+├── docs/                               # GitHub Pages root
+│   ├── index.html                      # marketing site (from design handoff)
+│   ├── assets/colors_and_type.css      # shared design tokens
+│   └── screenshots/                    # README + marketing site images
+├── .github/workflows/
+│   ├── ci.yml                          # macOS-15 build + test + .app artifact
+│   └── pages.yml                       # deploy docs/ to GitHub Pages
+└── Makefile                            # build / run / test / app / install
 ```
 
 ## Releases & auto-update
 
 ```bash
-./scripts/release.sh v0.1.0
+./scripts/release.sh v0.1.1
 ```
 
-This builds a universal binary, ad-hoc signs the bundle, zips it, tags, pushes, and creates a GitHub release with the artifact attached. Sparkle pulls `https://peguesj.github.io/claude-code-macos-helper/appcast.xml` (EdDSA-signed) for in-app update prompts.
+This builds a universal binary (arm64 + x86_64), ad-hoc signs the bundle, zips it, tags, pushes, and creates a GitHub release with the artifact attached. Sparkle pulls `https://peguesj.github.io/claude-code-macos-helper/appcast.xml` (EdDSA-signed) for in-app update prompts.
+
+## Contributing
+
+Open an issue first for anything bigger than a typo. PRs welcome. CI runs `swift test`, `swift build -c release`, and a screenshot diff. Style: 4-space indent, brace-on-same-line, `@MainActor` for any class that touches UI.
+
+The `develop/browser-automation` branch is parked as the alternative to deep-links (form-driving claude.ai). It's not on the roadmap unless multiple users ask.
 
 ## Roadmap
 
@@ -166,14 +281,20 @@ This builds a universal binary, ad-hoc signs the bundle, zips it, tags, pushes, 
 | 2 — Menubar shell | ✅ | CMH-5 … CMH-8 |
 | 3 — Profile system | ✅ | CMH-9 … CMH-12 |
 | 4 — Settings + spend | ✅ | CMH-13 … CMH-16 |
-| 5 — Polish & ship | ✅ | CMH-17 … CMH-20 |
+| 5 — Polish + ship | ✅ | CMH-17 … CMH-20 |
+| 6 — Bootstrap + brand | ✅ | CMH-21 … CMH-25 |
+| 7 — AppleScript + Notarization | ⏳ | post-v0.1.1 |
 
-Browser-automation alternative (form-driving against claude.ai) lives on the `develop/browser-automation` worktree branch — parked for future evaluation.
-
-## Contributing
-
-Open an issue first for anything bigger than a typo. PRs welcome; we run `swift test`, `swift format lint`, and a screenshot diff check in CI.
+Next priorities: AppleScript scripting bridge, optional notarization path if a sponsor provides a Dev ID, sandbox-friendly entitlement set.
 
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+---
+
+<div align="center">
+
+<sub>Not affiliated with Anthropic. Claude and the Claude wordmark are trademarks of Anthropic, PBC.</sub>
+
+</div>

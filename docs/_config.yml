@@ -1,0 +1,9 @@
+title: Claude Helper
+description: Unofficial macOS menubar companion for Claude Code
+theme: null
+plugins: []
+include:
+  - assets
+exclude:
+  - screenshots/.user-captures
+  - "*.md"

@@ -1,0 +1,242 @@
+/* ============================================================
+   Claude Helper — Design Tokens
+   Extracted from claude-code-macos-helper/Sources/ClaudeHelper/
+   ============================================================ */
+
+:root {
+  /* ---------- BRAND ----------------------------------------- */
+  --brand-coral:        #CC785C;  /* primary; menubar arc + meter fill < 0.7 */
+  --brand-coral-rgb:    204, 120, 92;
+  --brand-coral-dark:   #B05A40;  /* hover/pressed */
+  --brand-coral-tint:   #E8B7A5;  /* 30% mix w/ white, for soft surfaces */
+
+  /* ---------- SEMANTIC (meter thresholds) -------------------- */
+  --semantic-ok:        var(--brand-coral);   /* ratio < 0.70 */
+  --semantic-warn:      #FF9500;               /* ratio < 0.90 (systemOrange) */
+  --semantic-danger:    #FF3B30;               /* ratio ≥ 0.90 (systemRed)    */
+  --semantic-info:      #007AFF;               /* fallback Color.accentColor on macOS */
+  --semantic-success:   #34C759;
+
+  /* status pill backgrounds — full color @ 0.18 alpha */
+  --pill-bg-ok:         rgba(204, 120, 92, 0.18);
+  --pill-bg-warn:       rgba(255, 149, 0,  0.18);
+  --pill-bg-danger:     rgba(255, 59, 48,  0.18);
+  --pill-bg-info:       rgba(0, 122, 255,  0.18);
+  --pill-bg-success:    rgba(52, 199, 89,  0.18);
+
+  /* ---------- NEUTRALS (light mode, macOS-derived) ----------- */
+  --bg-popover:         rgba(246, 246, 247, 0.85);  /* .regularMaterial blur surface */
+  --bg-popover-solid:   #F4F4F5;                    /* opaque fallback */
+  --bg-card:            rgba(0, 0, 0, 0.06);        /* Color.gray.opacity(0.06) */
+  --bg-card-hover:      rgba(0, 0, 0, 0.08);
+  --bg-active:          rgba(204, 120, 92, 0.08);   /* accent.opacity(0.08) row */
+  --bg-tab-active:      rgba(204, 120, 92, 0.12);   /* accent.opacity(0.12) tab */
+
+  --fg-primary:         rgba(0, 0, 0, 0.92);        /* .primary */
+  --fg-secondary:       rgba(0, 0, 0, 0.55);        /* .secondary */
+  --fg-tertiary:        rgba(0, 0, 0, 0.36);        /* .tertiary */
+  --fg-quaternary:      rgba(0, 0, 0, 0.20);        /* .quaternary, separators */
+
+  --divider:            rgba(0, 0, 0, 0.10);
+  --divider-strong:     rgba(0, 0, 0, 0.18);
+
+  /* ---------- TYPE ------------------------------------------- */
+  --font-system:        -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+                        "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-rounded:       ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont,
+                        "Nunito", "Inter", sans-serif;
+  --font-mono:          ui-monospaced, "SF Mono", Menlo, "JetBrains Mono", Consolas, monospace;
+
+  /* sizes (px, matching SwiftUI .system(size: ...)) */
+  --fs-9:    9px;   /* ACTIVE chip */
+  --fs-10:   10px;  /* tab title */
+  --fs-11:   11px;  /* caption / mono ratio / UPPERCASE section */
+  --fs-12:   12px;
+  --fs-13:   13px;  /* body / row label */
+  --fs-14:   14px;  /* tab icon */
+  --fs-16:   16px;  /* projected number (small) */
+  --fs-17:   17px;  /* headline "Claude Helper" */
+  --fs-22:   22px;  /* header logo glyph */
+  --fs-28:   28px;  /* display $104.81 */
+  --fs-48:   48px;  /* marketing hero */
+  --fs-72:   72px;
+
+  --fw-regular:   400;
+  --fw-medium:    500;
+  --fw-semibold:  600;
+  --fw-bold:      700;
+
+  --lh-tight:     1.15;
+  --lh-snug:      1.30;
+  --lh-normal:    1.45;
+
+  --tracking-caps: 0.06em;   /* UPPERCASE section labels */
+  --tracking-chip: 0.08em;   /* 9pt ACTIVE chip */
+
+  /* ---------- SPACING (4pt grid, common stops) --------------- */
+  --sp-1:  2px;
+  --sp-2:  4px;
+  --sp-3:  6px;
+  --sp-4:  8px;
+  --sp-5:  10px;
+  --sp-6:  12px;
+  --sp-7:  14px;
+  --sp-8:  16px;
+  --sp-10: 20px;
+  --sp-12: 24px;
+  --sp-16: 32px;
+  --sp-20: 40px;
+  --sp-24: 48px;
+
+  /* popover dimensions */
+  --popover-w:     420px;
+  --popover-h:     520px;
+  --popover-pad:   14px;
+  --row-pad:       8px;
+  --row-pad-lg:    10px;
+
+  /* ---------- RADII ----------------------------------------- */
+  --r-card:        8px;
+  --r-card-lg:     10px;
+  --r-pill:        999px;
+  --r-meter:       2.5px;   /* meter height / 2 */
+  --r-popover:     12px;    /* OS-level on real macOS, web mock */
+
+  /* ---------- ELEVATION (web fallback only) ----------------- */
+  --shadow-popover: 0 24px 60px rgba(0, 0, 0, 0.20),
+                    0 6px  18px rgba(0, 0, 0, 0.12);
+  --shadow-menubar: 0 1px 3px rgba(0, 0, 0, 0.12);
+
+  /* ---------- MOTION ---------------------------------------- */
+  --dur-fast:   120ms;
+  --dur-base:   240ms;
+  --dur-slow:   480ms;
+  --dur-meter:  800ms;
+  --ease-out:   cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ---------- DARK MODE ------------------------------------------ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-popover:       rgba(34, 34, 36, 0.85);
+    --bg-popover-solid: #1E1E20;
+    --bg-card:          rgba(255, 255, 255, 0.06);
+    --bg-card-hover:    rgba(255, 255, 255, 0.10);
+    --bg-active:        rgba(204, 120, 92, 0.14);
+    --bg-tab-active:    rgba(204, 120, 92, 0.20);
+
+    --fg-primary:       rgba(255, 255, 255, 0.95);
+    --fg-secondary:     rgba(255, 255, 255, 0.60);
+    --fg-tertiary:      rgba(255, 255, 255, 0.40);
+    --fg-quaternary:    rgba(255, 255, 255, 0.22);
+
+    --divider:          rgba(255, 255, 255, 0.10);
+    --divider-strong:   rgba(255, 255, 255, 0.18);
+
+    --shadow-popover:   0 24px 60px rgba(0, 0, 0, 0.60),
+                        0 6px  18px rgba(0, 0, 0, 0.40);
+  }
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT MAPS
+   ============================================================ */
+
+.ch-popover {
+  width: var(--popover-w);
+  background: var(--bg-popover);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-radius: var(--r-popover);
+  box-shadow: var(--shadow-popover);
+  font-family: var(--font-system);
+  color: var(--fg-primary);
+}
+
+.ch-headline    { font: var(--fw-semibold) var(--fs-17)/var(--lh-tight) var(--font-system); }
+.ch-display     { font: var(--fw-medium)   var(--fs-28)/var(--lh-tight) var(--font-rounded);
+                  letter-spacing: -0.01em; }
+.ch-display-sm  { font: var(--fw-medium)   var(--fs-16)/var(--lh-tight) var(--font-rounded); }
+.ch-body        { font: var(--fw-regular)  var(--fs-13)/var(--lh-snug)  var(--font-system); }
+.ch-body-em     { font: var(--fw-medium)   var(--fs-13)/var(--lh-snug)  var(--font-system); }
+.ch-caption     { font: var(--fw-regular)  var(--fs-11)/var(--lh-snug)  var(--font-system);
+                  color: var(--fg-secondary); }
+.ch-mono        { font: var(--fw-regular)  var(--fs-11)/var(--lh-snug)  var(--font-mono);
+                  color: var(--fg-secondary); }
+.ch-section     { font: var(--fw-semibold) var(--fs-11)/var(--lh-tight) var(--font-system);
+                  color: var(--fg-secondary);
+                  text-transform: uppercase;
+                  letter-spacing: var(--tracking-caps); }
+.ch-chip        { font: var(--fw-bold)     var(--fs-9)/1 var(--font-system);
+                  text-transform: uppercase;
+                  letter-spacing: var(--tracking-chip); }
+.ch-tab-label   { font: var(--fw-regular)  var(--fs-10)/1 var(--font-system); }
+
+.ch-card {
+  background: var(--bg-card);
+  border-radius: var(--r-card);
+  padding: var(--row-pad-lg);
+}
+.ch-card:hover { background: var(--bg-card-hover); }
+.ch-card--active { background: var(--bg-active); }
+
+.ch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: var(--r-pill);
+  font: var(--fw-regular) var(--fs-11)/1 var(--font-system);
+}
+.ch-pill--ok      { background: var(--pill-bg-ok);      color: var(--brand-coral); }
+.ch-pill--warn    { background: var(--pill-bg-warn);    color: var(--semantic-warn); }
+.ch-pill--danger  { background: var(--pill-bg-danger);  color: var(--semantic-danger); }
+.ch-pill--info    { background: var(--pill-bg-info);    color: var(--semantic-info); }
+.ch-pill--success { background: var(--pill-bg-success); color: var(--semantic-success); }
+
+.ch-divider { height: 1px; background: var(--divider); border: 0; margin: 0; }
+
+.ch-btn {
+  font: var(--fw-medium) var(--fs-13)/1 var(--font-system);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 0;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out),
+              opacity var(--dur-fast) var(--ease-out);
+}
+.ch-btn--prominent { background: var(--semantic-info); color: white; padding: 7px 14px; border-radius: 7px; }
+.ch-btn--prominent.accent-coral { background: var(--brand-coral); }
+.ch-btn--prominent:hover  { filter: brightness(1.05); }
+.ch-btn--prominent:active { filter: brightness(0.92); }
+.ch-btn--borderless { background: transparent; color: var(--semantic-info); padding: 4px 6px; }
+.ch-btn--borderless:hover  { background: var(--bg-card-hover); }
+.ch-btn--borderless:active { opacity: 0.7; }
+
+.ch-meter {
+  --ratio: 0;
+  --fill: var(--brand-coral);
+  height: 5px;
+  width: 100%;
+  background: var(--fg-quaternary);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  position: relative;
+}
+.ch-meter::after {
+  content: "";
+  position: absolute; inset: 0;
+  width: calc(var(--ratio) * 100%);
+  background: var(--fill);
+  border-radius: var(--r-pill);
+  transition: width var(--dur-meter) var(--ease-out),
+              background var(--dur-base) var(--ease-out);
+}
+
+/* Inline horizontal capsule meter (menubar) */
+.ch-meter--menubar {
+  height: 5px;
+  width: 28px;
+  background: rgba(255, 255, 255, 0.30);
+}

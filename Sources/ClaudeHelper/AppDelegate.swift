@@ -33,6 +33,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 .requestAuthorization(options: [.alert, .sound])
         }
 
+        Task { [profileStore] in
+            await ProfileBootstrap.ensureDefaultProfile(store: profileStore!)
+        }
+
         forecaster.alerts
             .receive(on: DispatchQueue.main)
             .sink { alert in NotificationDispatcher.post(alert) }
@@ -42,8 +46,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if ProcessInfo.processInfo.environment["CLAUDEHELPER_SCREENSHOT_MODE"] == "1" {
             Task { @MainActor in
-                try? await Task.sleep(nanoseconds: 800_000_000)
-                ScreenshotRenderer.renderAll(controller: statusController)
+                // Wait for bootstrap + first telemetry tick so meters render with real shape
+                await ProfileBootstrap.ensureDefaultProfile(store: self.profileStore)
+                await self.telemetry.refreshOnce()
+                try? await Task.sleep(nanoseconds: 600_000_000)
+                ScreenshotRenderer.renderAll(controller: self.statusController)
                 NSApp.terminate(nil)
             }
         }
