@@ -28,7 +28,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
         statusController.install()
 
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+        Task.detached {
+            _ = try? await UNUserNotificationCenter.current()
+                .requestAuthorization(options: [.alert, .sound])
+        }
 
         forecaster.alerts
             .receive(on: DispatchQueue.main)
