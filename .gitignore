@@ -19,3 +19,5 @@ docs/screenshots/.cache/
 .idea/
 xcuserdata/
 .apm.pid
+.claude/hooks/data/
+.claude/hooks/logs/
