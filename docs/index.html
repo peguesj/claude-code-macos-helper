@@ -252,6 +252,57 @@
   /* Reveal-on-scroll */
   .reveal { opacity: 0; transform: translateY(16px); transition: opacity 600ms cubic-bezier(0.22,1,0.36,1), transform 600ms cubic-bezier(0.22,1,0.36,1); }
   .reveal.in { opacity: 1; transform: translateY(0); }
+  /* If JS is disabled or the observer never fires, ensure content is still visible after a beat. */
+  .no-js .reveal, html.reveal-fallback .reveal { opacity: 1; transform: none; }
+
+  /* Install cards */
+  .install-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    margin-top: 40px; text-align: left;
+  }
+  @media (max-width: 760px) { .install-grid { grid-template-columns: 1fr; } }
+  .install-card {
+    background: white; border: 1px solid var(--line); border-radius: 14px;
+    padding: 28px; position: relative; display: flex; flex-direction: column; gap: 14px;
+    box-shadow: var(--shadow-1);
+  }
+  .install-card.recommended { border-color: rgba(204,120,92,0.45); box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 18px 48px rgba(204,120,92,0.10); }
+  .install-card h3 { font-size: 18px; margin: 0; letter-spacing: -0.01em; }
+  .install-card > p { font-size: 13px; color: var(--ink-2); margin: 0; }
+  .install-card .badge {
+    position: absolute; top: 16px; right: 16px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent); background: rgba(204,120,92,0.12);
+    padding: 4px 8px; border-radius: 999px;
+  }
+  .codeblock {
+    background: #1d1d1f; color: #e8e6e1; padding: 16px 18px; border-radius: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; line-height: 1.7;
+    margin: 0; white-space: pre; overflow-x: auto;
+  }
+  .codeblock .prompt { color: rgba(232,230,225,0.40); user-select: none; }
+  .codeblock .comment { color: rgba(232,230,225,0.55); }
+  .sha-row {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(0,0,0,0.03); border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .sha-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-3); flex-shrink: 0;
+  }
+  .sha-hash {
+    font-size: 11px; color: var(--ink-2); word-break: break-all;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    flex: 1; user-select: all;
+  }
+  .warn-line {
+    font-size: 12px; color: var(--ink-2); margin: 0;
+    display: flex; gap: 8px; align-items: flex-start;
+    background: rgba(255,149,0,0.07); border-left: 2px solid rgba(255,149,0,0.55);
+    padding: 10px 12px; border-radius: 0 6px 6px 0;
+  }
+  .warn-line svg { flex-shrink: 0; margin-top: 2px; }
 
   /* Tiny svg helpers */
   .iconSlot { width: 22px; height: 22px; color: var(--ink-2); }
@@ -277,7 +328,7 @@
       <a href="#faq">FAQ</a>
     </div>
     <div class="nav-cta-group">
-      <a class="btn btn-ghost" href="#" aria-label="GitHub repository">
+      <a class="btn btn-ghost" href="https://github.com/peguesj/claude-code-macos-helper" aria-label="GitHub repository">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.6.5.5 5.6.5 12c0 5.1 3.3 9.4 7.8 11 .6.1.8-.2.8-.6v-2.2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.4-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2.9-.3 2-.4 3-.4s2.1.1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.1 0 4.5-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.8-5.8 7.8-11C23.5 5.6 18.4.5 12 .5Z"/></svg>
         GitHub
       </a>
@@ -293,7 +344,7 @@
 <header class="hero">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <span class="eyebrow"><span class="eyebrow-dot"></span> v0.1 · macOS 13+</span>
+      <span class="eyebrow"><span class="eyebrow-dot"></span> v0.1.1 &middot; macOS 15+</span>
       <h1 class="headline">See your Claude Code usage <span class="accent">at a glance.</span></h1>
       <p class="lede">A tiny menubar app that surfaces your context window, monthly limits, and spend forecast — without opening a browser tab.</p>
       <div class="cta-row">
@@ -304,9 +355,9 @@
         <a class="btn" href="#how">See how it works →</a>
       </div>
       <div class="install-line">
-        <span>or install via</span>
-        <code class="mono">brew install --cask claude-helper</code>
-        <button class="copy-btn" aria-label="Copy install command" onclick="copyText(this, 'brew install --cask claude-helper')">
+        <span>or build from source &mdash;</span>
+        <code class="mono">make app CONFIG=release</code>
+        <button class="copy-btn" aria-label="Copy build command" onclick="copyText(this, 'make app CONFIG=release')">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
       </div>
@@ -654,21 +705,68 @@
 </section>
 
 <!-- ────────── INSTALL ────────── -->
-<section id="install" style="text-align:center;">
-  <div class="wrap" style="max-width:720px;">
-    <span class="section-eyebrow">Install</span>
-    <h2 class="section-title">Up and running in under a minute.</h2>
-    <div style="margin:36px auto;display:flex;flex-direction:column;gap:10px;text-align:left;background:#1d1d1f;color:#e8e6e1;padding:20px 22px;border-radius:12px;font-family:ui-monospace,monospace;font-size:13px;line-height:1.7;">
-      <div><span style="color:rgba(232,230,225,0.40);user-select:none;">$ </span>brew install --cask claude-helper</div>
-      <div><span style="color:rgba(232,230,225,0.40);user-select:none;">$ </span>open -a "Claude Helper"</div>
-      <div style="color:rgba(232,230,225,0.55);">→ Click the menubar arc and add your first profile.</div>
+<section id="install">
+  <div class="wrap" style="max-width:920px;">
+    <div class="reveal" style="text-align:center;">
+      <span class="section-eyebrow">Install</span>
+      <h2 class="section-title">Build it yourself &mdash; or verify the download.</h2>
+      <p class="section-lede" style="max-width:680px;margin-left:auto;margin-right:auto;">
+        Claude Helper isn't on Homebrew. The prebuilt bundle is ad-hoc signed because the maintainer
+        doesn't run an Apple Developer account, so Gatekeeper will warn on first open.
+        Build from source for the strongest trust path &mdash; or verify the SHA-256 below.
+      </p>
     </div>
-    <div class="cta-row" style="justify-content:center;">
-      <a class="btn btn-primary" href="#">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-        Download .dmg (universal)
-      </a>
-      <a class="btn" href="#">View on GitHub</a>
+
+    <div class="install-grid">
+      <!-- Option A — Build from source (recommended) -->
+      <div class="install-card recommended reveal">
+        <span class="badge">Recommended</span>
+        <h3>Build from source</h3>
+        <p>macOS 15+, Xcode 16+, Swift 6.0, GNU make. The binary never touches the internet, so Gatekeeper leaves it alone.</p>
+        <pre class="codeblock"><span class="prompt">$ </span>git clone https://github.com/peguesj/claude-code-macos-helper.git
+<span class="prompt">$ </span>cd claude-code-macos-helper
+<span class="prompt">$ </span>make app CONFIG=release
+<span class="prompt">$ </span>make install   <span class="comment"># copies to /Applications and launches</span></pre>
+        <div class="cta-row" style="margin-top:4px;">
+          <a class="btn btn-primary" href="https://github.com/peguesj/claude-code-macos-helper#build-from-source">
+            Full build instructions &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Option B — Download prebuilt bundle (verify first) -->
+      <div class="install-card reveal">
+        <h3>Download prebuilt bundle</h3>
+        <p>Ad-hoc signed universal <code class="mono">.app</code> packaged as a zip. Verify the SHA-256 before opening.</p>
+        <div class="cta-row" style="margin-top:0;">
+          <a class="btn btn-primary" href="https://github.com/peguesj/claude-code-macos-helper/releases/download/v0.1.1/ClaudeHelper-v0.1.1.zip">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            ClaudeHelper-v0.1.1.zip (6.4 MB)
+          </a>
+        </div>
+        <div class="sha-row">
+          <span class="sha-label">SHA-256</span>
+          <code class="sha-hash">c025dfdb1b29a2e8d9bc93682bf0d7997e504728af41d03350635b5884c48a0d</code>
+          <button class="copy-btn" aria-label="Copy SHA-256" onclick="copyText(this, 'c025dfdb1b29a2e8d9bc93682bf0d7997e504728af41d03350635b5884c48a0d')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          </button>
+        </div>
+        <pre class="codeblock"><span class="prompt">$ </span>shasum -a 256 ClaudeHelper-v0.1.1.zip
+<span class="comment"># must match the hash above before you unzip</span>
+<span class="prompt">$ </span>unzip ClaudeHelper-v0.1.1.zip
+<span class="prompt">$ </span>mv ClaudeHelper.app /Applications/
+<span class="prompt">$ </span>xattr -dr com.apple.quarantine /Applications/ClaudeHelper.app
+<span class="prompt">$ </span>open /Applications/ClaudeHelper.app</pre>
+        <p class="warn-line">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b87327" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+          <span>Ad-hoc signed &ne; verified. Anyone who can swap the zip on the release page can ship a different binary. The SHA above is published from this site (separate channel from the binary CDN). If you can't run <code class="mono">shasum</code>, build from source instead.</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="cta-row reveal" style="justify-content:center;margin-top:32px;">
+      <a class="btn" href="https://github.com/peguesj/claude-code-macos-helper/releases">All releases &amp; checksums &rarr;</a>
+      <a class="btn" href="https://github.com/peguesj/claude-code-macos-helper">View source on GitHub</a>
     </div>
   </div>
 </section>
@@ -691,7 +789,11 @@
       </details>
       <details class="faq-item">
         <summary class="faq-q">Is it open source?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span></summary>
-        <div class="faq-a"><div class="faq-a-inner">MIT-licensed on GitHub. The build is reproducible; CI publishes the same notarized .dmg as the website.</div></div>
+        <div class="faq-a"><div class="faq-a-inner">MIT-licensed on GitHub. Clone, audit, build &mdash; the source is a single SPM target. The prebuilt zip on the Releases page is ad-hoc signed (no Apple Developer ID), so for the strongest trust path, build from source. The SHA-256 of each release is published on this page.</div></div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-q">Why isn't it on Homebrew, signed, or notarized?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span></summary>
+        <div class="faq-a"><div class="faq-a-inner">Apple Developer ID signing and notarization require a $99/year Apple Developer account, which the maintainer doesn't run. Homebrew cask submissions effectively require a signed-and-notarized binary. The recommended install is <code class="mono">make app CONFIG=release</code> &mdash; you trust your own toolchain, no Gatekeeper friction. If someone wants to sponsor a Developer ID, open an issue.</div></div>
       </details>
       <details class="faq-item">
         <summary class="faq-q">Why a menubar app instead of a CLI?<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg></span></summary>
@@ -726,21 +828,21 @@
       </div>
       <div class="foot-col">
         <h5>Source</h5>
-        <a href="#">GitHub</a>
-        <a href="#">Releases</a>
-        <a href="#">Issues</a>
+        <a href="https://github.com/peguesj/claude-code-macos-helper">GitHub</a>
+        <a href="https://github.com/peguesj/claude-code-macos-helper/releases">Releases</a>
+        <a href="https://github.com/peguesj/claude-code-macos-helper/issues">Issues</a>
       </div>
       <div class="foot-col">
         <h5>About</h5>
-        <a href="#">Privacy</a>
-        <a href="#">License (MIT)</a>
-        <a href="#">Attribution</a>
+        <a href="#privacy">Privacy</a>
+        <a href="https://github.com/peguesj/claude-code-macos-helper/blob/main/LICENSE">License (MIT)</a>
+        <a href="https://github.com/peguesj/claude-code-macos-helper#why">About</a>
       </div>
     </div>
   </div>
   <div class="wrap colophon">
     <span>Not affiliated with Anthropic.</span>
-    <span class="mono" style="margin-left:auto;">v0.1.0 · built {build}</span>
+    <span class="mono" style="margin-left:auto;">v0.1.1 · built <span id="build-date">&mdash;</span></span>
   </div>
 </footer>
 
@@ -766,8 +868,11 @@
     });
   });
 
-  // build date
-  document.body.innerHTML = document.body.innerHTML.replace('{build}', new Date().toISOString().slice(0, 10));
+  // build date — targeted update so we don't blow away nodes the IntersectionObserver
+  // is already watching (rewriting document.body.innerHTML detaches every .reveal element
+  // and the observer keeps referencing the dead nodes, leaving the page faded out)
+  const buildEl = document.getElementById('build-date');
+  if (buildEl) buildEl.textContent = new Date().toISOString().slice(0, 10);
 </script>
 
 </body>
