@@ -346,7 +346,7 @@
     <div class="hero-copy">
       <span class="eyebrow"><span class="eyebrow-dot"></span> v0.1.1 &middot; macOS 15+</span>
       <h1 class="headline">See your Claude Code usage <span class="accent">at a glance.</span></h1>
-      <p class="lede">A tiny menubar app that surfaces your context window, monthly limits, and spend forecast — without opening a browser tab.</p>
+      <p class="lede">A tiny menubar app that surfaces your context window, monthly limits, and a usage-pace forecast — without opening a browser tab.</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="#install">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
@@ -413,8 +413,8 @@
               <div class="pop-track danger"><i style="width:94%"></i></div>
             </div>
             <div class="pop-spend" style="display:flex;align-items:baseline;gap:8px;">
-              <span class="pop-money">$104.81</span>
-              <span class="pop-flag">Over limit</span>
+              <span class="pop-money">4.7M / 5M</span>
+              <span class="pop-flag">Over cap pace</span>
             </div>
           </div>
         </div>
@@ -474,8 +474,8 @@
             <line x1="0" y1="14" x2="120" y2="14" stroke="#ff3b30" stroke-width="1" stroke-dasharray="3 3"/>
           </svg>
         </div>
-        <h3>Spend forecast</h3>
-        <p>Linear projection of your month-end total against the limit you set, so you spot a burn-rate problem on day six, not day twenty-eight.</p>
+        <h3>Usage forecast</h3>
+        <p>Plan-aware projection: a token usage-pace forecast for subscription plans (Max, Pro, Team), a dollar burn-rate for pay-as-you-go API keys — so you spot a problem on day six, not day twenty-eight.</p>
       </div>
       <div class="feature reveal">
         <div class="visual">
@@ -596,25 +596,25 @@
 
     <div class="feat-row reverse">
       <div class="feat-content reveal">
-        <span class="section-eyebrow">Spend</span>
-        <h3>A burn-rate forecast you can actually act on.</h3>
-        <p>Helper draws a linear projection from your month-to-date spend and your average daily run-rate. Cross the limit line on day six, and you'll see red on day seven — not when the invoice arrives.</p>
+        <span class="section-eyebrow">Forecast</span>
+        <h3>A pace forecast you can actually act on.</h3>
+        <p>On a subscription, Helper projects your month-to-date token consumption against your all-models cap — no fictional dollar figure, because a Max plan has no per-token cost. On a pay-as-you-go API key it draws the dollar burn-rate instead. Either way: cross the line on day six, see red on day seven — not when the limit hits.</p>
       </div>
       <div class="feat-visual reveal">
         <div style="display:flex;align-items:flex-start;margin-bottom:12px;">
           <div>
-            <div style="font-size:11px;color:var(--ink-2)">This month</div>
-            <div style="font-family:ui-rounded,sans-serif;font-size:28px;font-weight:500;letter-spacing:-0.01em;">$37.20</div>
+            <div style="font-size:11px;color:var(--ink-2)">All-models this month</div>
+            <div style="font-family:ui-rounded,sans-serif;font-size:28px;font-weight:500;letter-spacing:-0.01em;">1.2M</div>
           </div>
           <div style="margin-left:auto;text-align:right;">
             <div style="font-size:11px;color:var(--ink-2)">Projected</div>
-            <div style="font-family:ui-rounded,sans-serif;font-size:18px;font-weight:500;color:var(--danger);">$104.81</div>
+            <div style="font-family:ui-rounded,sans-serif;font-size:18px;font-weight:500;color:var(--danger);">4.7M / 5M</div>
           </div>
         </div>
         <svg viewBox="0 0 320 120" width="100%" height="120">
           <defs><linearGradient id="bgrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#cc785c"/><stop offset="100%" stop-color="#cc785c" stop-opacity="0.4"/></linearGradient></defs>
           <line x1="0" y1="40" x2="320" y2="40" stroke="#ff3b30" stroke-width="1" stroke-dasharray="4 4" opacity="0.55"/>
-          <text x="318" y="36" text-anchor="end" font-size="9" fill="#ff3b30" font-family="ui-monospace,monospace">limit $75</text>
+          <text x="318" y="36" text-anchor="end" font-size="9" fill="#ff3b30" font-family="ui-monospace,monospace">cap 5M</text>
           <g>
             <rect x="0"   y="98" width="10" height="14" rx="1.5" fill="url(#bgrad)"/>
             <rect x="14"  y="92" width="10" height="20" rx="1.5" fill="url(#bgrad)"/>
@@ -653,8 +653,8 @@
               <span style="font-size:10px;color:rgba(255,255,255,0.55)">now</span>
             </div>
           </div>
-          <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Spend at 80% of limit</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.75)">$60.04 of $75.00 this month · projected $104.81</div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Usage at 80% of cap</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.75)">3.9M of 5M all-models this month · projected 4.7M</div>
         </div>
       </div>
     </div>
