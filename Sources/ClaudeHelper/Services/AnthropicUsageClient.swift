@@ -5,6 +5,7 @@ import Foundation
 /// Falls back to a stub snapshot when no key is configured or the org doesn't expose the Admin API.
 actor AnthropicUsageClient {
     var apiKey: String?
+    var currentPlan: Plan = Plan(kind: .max5x)
     private let session: URLSession
 
     init(apiKey: String? = nil, session: URLSession = .shared) {
@@ -13,9 +14,12 @@ actor AnthropicUsageClient {
     }
 
     func setKey(_ key: String?) { self.apiKey = key }
+    func setPlan(_ plan: Plan)  { self.currentPlan = plan }
 
     func fetchSnapshot() async -> TelemetrySnapshot {
-        guard let key = apiKey, !key.isEmpty else { return stubSnapshot() }
+        guard let key = apiKey, !key.isEmpty else {
+            return LocalSnapshotReader.read(plan: currentPlan) ?? stubSnapshot()
+        }
 
         do {
             async let usage = fetchUsageReport(key: key)

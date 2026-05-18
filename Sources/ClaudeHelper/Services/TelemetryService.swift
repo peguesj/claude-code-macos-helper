@@ -34,15 +34,16 @@ final class TelemetryService: ObservableObject {
     func stop() async { pollTask?.cancel(); pollTask = nil }
 
     func refreshOnce() async {
-        if let profile = profileStore.activeProfile,
-           let key = profileStore.apiKey(for: profile) {
+        let profile = profileStore.activeProfile
+        if let key = profile.flatMap({ profileStore.apiKey(for: $0) }) {
             await client.setKey(key)
         } else {
             await client.setKey(nil)
         }
+        await client.setPlan(profile?.plan ?? Plan(kind: .max5x))
         let snap = await client.fetchSnapshot()
         await MainActor.run { self.snapshot = snap }
-        ledger.record(snapshot: snap, profileID: profileStore.activeProfile?.id)
+        ledger.record(snapshot: snap, profileID: profile?.id)
     }
 }
 

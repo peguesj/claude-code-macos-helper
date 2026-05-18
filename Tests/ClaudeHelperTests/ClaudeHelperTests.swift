@@ -31,6 +31,20 @@ final class ClaudeHelperTests: XCTestCase {
         }
     }
 
+    func testPlanTokenLimitsAreNonNegative() {
+        for kind in Plan.Kind.allCases {
+            let plan = Plan(kind: kind)
+            XCTAssertGreaterThanOrEqual(plan.approxSessionTokenLimit,    0)
+            XCTAssertGreaterThanOrEqual(plan.approxWeekAllModelsLimit,   0)
+            XCTAssertGreaterThanOrEqual(plan.approxWeekSonnetLimit,      0)
+        }
+    }
+
+    func testMax5xSessionLimitExceedsPro() {
+        XCTAssertGreaterThan(Plan(kind: .max5x).approxSessionTokenLimit,
+                             Plan(kind: .pro).approxSessionTokenLimit)
+    }
+
     // Bug B invariant: no current plan is metered, so none may surface a
     // token-extrapolated dollar forecast.
     func testNoCurrentPlanIsMetered() {

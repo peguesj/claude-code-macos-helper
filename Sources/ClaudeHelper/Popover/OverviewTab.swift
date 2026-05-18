@@ -47,24 +47,39 @@ struct OverviewTab: View {
 
     private func meterRow(label: String, meter: TelemetryMeter) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack {
+            HStack(alignment: .firstTextBaseline) {
                 Text(label).font(.system(size: 13))
                 Spacer()
-                Text("\(Int(meter.used)) / \(Int(meter.limit))")
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .trailing, spacing: 1) {
+                    if meter.limit > 0 {
+                        Text("\(Forecaster.compact(meter.used)) / \(Forecaster.compact(meter.limit))")
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text(Forecaster.compact(meter.used))
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundStyle(.secondary)
+                    }
+                    if let resetsAt = meter.resetsAt {
+                        Text("resets \(resetsAt, style: .relative)")
+                            .font(.system(size: 9))
+                            .foregroundStyle(.tertiary)
+                    }
+                }
             }
-            ProgressView(value: meter.ratio)
-                .progressViewStyle(.linear)
-                .tint(meterColor(meter.ratio))
+            if meter.limit > 0 {
+                ProgressView(value: meter.ratio)
+                    .progressViewStyle(.linear)
+                    .tint(meterColor(meter.ratio))
+            }
         }
     }
 
     private func meterColor(_ ratio: Double) -> Color {
         switch ratio {
-        case ..<0.7: return .claudeClay
-        case ..<0.9: return .claudeWarn
-        default:     return .claudeDanger
+        case ..<0.5: return .green
+        case ..<0.8: return .yellow
+        default:     return .red
         }
     }
 }
