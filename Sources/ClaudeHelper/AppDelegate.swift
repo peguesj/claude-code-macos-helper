@@ -17,8 +17,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         profileStore = ProfileStore.shared
         spendLedger = (try? SpendLedger()) ?? SpendLedger.inMemory()
-        forecaster = Forecaster(ledger: spendLedger)
         telemetry = TelemetryService(profileStore: profileStore, ledger: spendLedger)
+        forecaster = Forecaster(ledger: spendLedger, profileStore: profileStore, telemetry: telemetry)
 
         statusController = StatusItemController(
             telemetry: telemetry,

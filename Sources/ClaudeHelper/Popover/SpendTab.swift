@@ -10,16 +10,28 @@ struct SpendTab: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .firstTextBaseline) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("This month").font(.caption).foregroundStyle(.secondary)
-                    Text(ledger.monthToDateUSD, format: .currency(code: "USD"))
-                        .font(.system(size: 28, weight: .medium, design: .rounded))
+                    Text(forecaster.isUsagePace ? "All-models this month" : "This month")
+                        .font(.caption).foregroundStyle(.secondary)
+                    if forecaster.isUsagePace {
+                        Text(Forecaster.compact(ledger.monthToDateTokens))
+                            .font(.system(size: 28, weight: .medium, design: .rounded))
+                    } else {
+                        Text(ledger.monthToDateUSD, format: .currency(code: "USD"))
+                            .font(.system(size: 28, weight: .medium, design: .rounded))
+                    }
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("Projected").font(.caption).foregroundStyle(.secondary)
-                    Text(forecaster.projectedMonthEndUSD, format: .currency(code: "USD"))
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
-                        .foregroundStyle(forecaster.statusColor)
+                    Group {
+                        if forecaster.isUsagePace {
+                            Text(forecaster.projectedUsageText)
+                        } else {
+                            Text(forecaster.projectedMonthEndUSD, format: .currency(code: "USD"))
+                        }
+                    }
+                    .font(.system(size: 16, weight: .medium, design: .rounded))
+                    .foregroundStyle(forecaster.statusColor)
                 }
             }
 

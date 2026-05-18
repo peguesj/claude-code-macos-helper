@@ -29,4 +29,16 @@ struct Plan: Codable, Hashable {
         case .enterprise: return 0 // unmetered / org-defined
         }
     }
+
+    /// Whether token usage on this plan incurs a per-token marginal dollar cost.
+    /// Every current plan is a flat-rate subscription (no pay-as-you-go billing),
+    /// so a token-extrapolated dollar "spend forecast" is meaningless for them —
+    /// the forecast shows a usage-pace projection instead. Reserved `false`/`true`
+    /// split so a future pay-as-you-go (API console) kind can opt back into dollars.
+    var hasMeteredTokenBilling: Bool {
+        switch kind {
+        case .free, .pro, .max5x, .max20x, .team, .enterprise:
+            return false
+        }
+    }
 }

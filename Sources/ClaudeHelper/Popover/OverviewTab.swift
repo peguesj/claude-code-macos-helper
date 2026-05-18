@@ -13,12 +13,17 @@ struct OverviewTab: View {
 
             Divider().padding(.vertical, 4)
 
-            sectionTitle("Spend forecast")
+            sectionTitle(forecaster.isUsagePace ? "Usage forecast" : "Spend forecast")
             HStack(alignment: .firstTextBaseline) {
-                Text(forecaster.projectedMonthEndUSD, format: .currency(code: "USD"))
-                    .font(.system(size: 28, weight: .medium, design: .rounded))
+                if forecaster.isUsagePace {
+                    Text(forecaster.projectedUsageText)
+                        .font(.system(size: 28, weight: .medium, design: .rounded))
+                } else {
+                    Text(forecaster.projectedMonthEndUSD, format: .currency(code: "USD"))
+                        .font(.system(size: 28, weight: .medium, design: .rounded))
+                }
                 Spacer()
-                Text("projected month-end").font(.caption).foregroundStyle(.secondary)
+                Text(forecaster.caption).font(.caption).foregroundStyle(.secondary)
             }
 
             HStack(spacing: 8) {
