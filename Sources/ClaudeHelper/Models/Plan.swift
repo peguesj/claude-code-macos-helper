@@ -56,24 +56,27 @@ struct Plan: Codable, Hashable {
     }
 
     // Approximate 7-day all-models rolling window token limit.
+    // Empirically: Max 20x observed 31% at 19.3M → ~63M. Max 5x and 20x share the
+    // same weekly cap; the plan multiplier scales the per-session rate, not the weekly quota.
     var approxWeekAllModelsLimit: Double {
         switch kind {
         case .free:       return   6_000_000
         case .pro:        return  12_600_000
         case .max5x:      return  63_000_000
-        case .max20x:     return 252_000_000
+        case .max20x:     return  63_000_000
         case .team:       return  25_000_000
         case .enterprise: return           0
         }
     }
 
     // Approximate 7-day Sonnet-model-only rolling window limit.
+    // Empirically: Max 20x observed 23% at 7.6M → ~33M.
     var approxWeekSonnetLimit: Double {
         switch kind {
         case .free:       return  2_000_000
         case .pro:        return  4_200_000
         case .max5x:      return 21_000_000
-        case .max20x:     return 84_000_000
+        case .max20x:     return 33_000_000
         case .team:       return  8_400_000
         case .enterprise: return          0
         }

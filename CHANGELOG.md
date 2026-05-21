@@ -4,6 +4,21 @@ All notable changes to Claude Helper are documented in this file. Format follows
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-05-21
+
+### Added
+- **Live telemetry** — FSEvents `DispatchSource` file watcher on `~/.claude/stats-cache.json` and `usage-snapshots/` directory; meters update within 500 ms of any hook write, no polling required. 60 s timer kept as fallback.
+- **AppIcon** — liquid-glass macOS icon: dark charcoal squircle, copper (#cc785c) Claude C-arc with glow filter, frosted-glass radial gradient, specular top-edge highlight, squircle border shimmer.
+- **Sparkle EdDSA key** wired into `Info.plist` (`SUPublicEDKey`) so update-check no longer fails.
+- **Appcast** (`docs/appcast.xml`) published to GitHub Pages — resolves "Check for Updates failed" (previously 404).
+
+### Changed
+- **Max 20x week limits corrected** — empirically derived from observed claude.ai percentages: all-models 63 M (was 252 M), Sonnet 33 M (was 84 M). Max 5× and 20× share the same weekly quota; the plan multiplier scales the per-session rate only.
+- **Session/Today meter** — `limit` set to `0` (no progress bar) because today's stats-cache cumulative spans multiple rate-limit windows and would misrepresent current window saturation. Raw token count still displayed.
+- **Stats-cache as primary data source** — `LocalSnapshotReader` reads `~/.claude/stats-cache.json` directly instead of relying solely on hook-written snapshots. Eliminates multi-session cross-contamination.
+- **Per-session snapshot files** — hook now writes `~/.claude/usage-snapshots/<session_id>.json` to prevent concurrent sessions stomping each other's data.
+- **OAuth fallback** corrected — `AnthropicUsageClient` catch block now falls back to `LocalSnapshotReader` instead of returning stub values when Admin API auth fails.
+
 ## [0.1.0] — 2026-05-11
 
 ### Added

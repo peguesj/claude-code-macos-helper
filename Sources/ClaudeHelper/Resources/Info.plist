@@ -6,6 +6,8 @@
     <string>en</string>
     <key>CFBundleExecutable</key>
     <string>ClaudeHelper</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundleIdentifier</key>
     <string>io.pegues.ClaudeHelper</string>
     <key>CFBundleInfoDictionaryVersion</key>
@@ -17,9 +19,9 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.1.0</string>
+    <string>0.2.0</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>2</string>
     <key>LSMinimumSystemVersion</key>
     <string>15.0</string>
     <key>LSUIElement</key>
@@ -32,6 +34,8 @@
     <true/>
     <key>SUFeedURL</key>
     <string>https://peguesj.github.io/claude-code-macos-helper/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>tW+/6Z2HEv1s8MGA8RYU93UDF+BVfxmGWftBqf2Dh/g=</string>
     <key>SUEnableInstallerLauncherService</key>
     <true/>
     <key>NSAppleEventsUsageDescription</key>

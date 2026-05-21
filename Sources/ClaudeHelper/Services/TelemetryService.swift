@@ -9,6 +9,7 @@ final class TelemetryService: ObservableObject {
     private let profileStore: ProfileStore
     private let ledger: SpendLedger
     private var pollTask: Task<Void, Never>?
+    private var fileWatcher: FileSystemWatcher?
     private var pollIntervalSec: Int {
         UserDefaults.standard.integer(forKey: "polling.intervalSec").nonZero(default: 60)
     }
@@ -21,6 +22,7 @@ final class TelemetryService: ObservableObject {
 
     func start() async {
         await refreshOnce()
+        startFileWatcher()
         pollTask = Task { @MainActor [weak self] in
             while !Task.isCancelled {
                 guard let self else { return }
@@ -31,7 +33,24 @@ final class TelemetryService: ObservableObject {
         }
     }
 
-    func stop() async { pollTask?.cancel(); pollTask = nil }
+    func stop() async {
+        pollTask?.cancel()
+        pollTask = nil
+        fileWatcher?.stop()
+        fileWatcher = nil
+    }
+
+    private func startFileWatcher() {
+        let home = NSHomeDirectory()
+        let watcher = FileSystemWatcher(debounce: 0.5) { [weak self] in
+            Task { await self?.refreshOnce() }
+        }
+        watcher.watch(paths: [
+            "\(home)/.claude/stats-cache.json",
+            "\(home)/.claude/usage-snapshots"
+        ])
+        fileWatcher = watcher
+    }
 
     func refreshOnce() async {
         let profile = profileStore.activeProfile

@@ -50,6 +50,12 @@ else
   echo "!!  Sparkle.framework not found — bundle will fail to launch on dyld load"
 fi
 
+# Copy AppIcon.icns
+ICNS_SRC="${ROOT}/Sources/ClaudeHelper/Resources/AppIcon.icns"
+if [[ -f "${ICNS_SRC}" ]]; then
+  cp "${ICNS_SRC}" "${APP_BUNDLE}/Contents/Resources/AppIcon.icns"
+fi
+
 # Copy bundled resources if any (Assets.car etc.)
 for bundleDir in "${BUILD_DIR}/release/${APP_NAME}_ClaudeHelper.bundle" "${BUILD_DIR}/apple/Products/Release/${APP_NAME}_ClaudeHelper.bundle"; do
   if [[ -d "${bundleDir}" ]]; then

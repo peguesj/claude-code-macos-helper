@@ -27,8 +27,8 @@ actor AnthropicUsageClient {
             let (u, c) = try await (usage, cost)
             return assemble(usage: u, cost: c)
         } catch {
-            Log.warn("Usage fetch failed: \(error.localizedDescription) — using stub")
-            return stubSnapshot()
+            Log.warn("Usage fetch failed: \(error.localizedDescription) — falling back to local snapshot")
+            return LocalSnapshotReader.read(plan: currentPlan) ?? stubSnapshot()
         }
     }
 
