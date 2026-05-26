@@ -344,9 +344,9 @@
 <header class="hero">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <span class="eyebrow"><span class="eyebrow-dot"></span> v0.1.1 &middot; macOS 15+</span>
+      <span class="eyebrow"><span class="eyebrow-dot"></span> v0.3.0 &middot; macOS 15+</span>
       <h1 class="headline">See your Claude Code usage <span class="accent">at a glance.</span></h1>
-      <p class="lede">A tiny menubar app that surfaces your context window, monthly limits, and a usage-pace forecast — without opening a browser tab.</p>
+      <p class="lede">A tiny menubar app that reads your local Claude Code transcripts directly — live percentages that match claude.ai, refreshed within seconds, with no API calls.</p>
       <div class="cta-row">
         <a class="btn btn-primary" href="#install">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
@@ -401,20 +401,19 @@
           </div>
           <div class="pop-body">
             <div class="pop-row">
-              <div class="pop-row-top"><span>Session</span><span>42 / 100</span></div>
-              <div class="pop-track"><i style="width:42%"></i></div>
+              <div class="pop-row-top"><span>Today</span><span style="color:var(--ink-2);font-size:10px;font-family:ui-monospace,monospace">21.7M</span></div>
             </div>
             <div class="pop-row">
-              <div class="pop-row-top"><span>All models</span><span>3.9M / 5M</span></div>
-              <div class="pop-track warn"><i style="width:78%"></i></div>
+              <div class="pop-row-top"><span>All models (wk)</span><span style="display:flex;gap:5px;align-items:baseline"><span style="color:var(--ink-2);font-size:10px;font-family:ui-monospace,monospace">21.7M / 240M</span><span style="font-size:11px;font-weight:700;color:var(--ok)">9%</span></span></div>
+              <div class="pop-track ok"><i style="width:9%;background:var(--ok)"></i></div>
             </div>
             <div class="pop-row">
-              <div class="pop-row-top"><span>Sonnet only</span><span>1.88M / 2M</span></div>
-              <div class="pop-track danger"><i style="width:94%"></i></div>
+              <div class="pop-row-top"><span>Sonnet (wk)</span><span style="display:flex;gap:5px;align-items:baseline"><span style="color:var(--ink-2);font-size:10px;font-family:ui-monospace,monospace">13.4M / 130M</span><span style="font-size:11px;font-weight:700;color:var(--ok)">10%</span></span></div>
+              <div class="pop-track ok"><i style="width:10%;background:var(--ok)"></i></div>
             </div>
             <div class="pop-spend" style="display:flex;align-items:baseline;gap:8px;">
-              <span class="pop-money">4.7M / 5M</span>
-              <span class="pop-flag">Over cap pace</span>
+              <span class="pop-money">2.7M / mo</span>
+              <span class="pop-flag" style="background:rgba(52,199,89,0.14);color:#1a7a38">On pace</span>
             </div>
           </div>
         </div>
@@ -442,7 +441,7 @@
           </div>
         </div>
         <h3>Three-meter glance</h3>
-        <p>Session, monthly all-models, and Sonnet-only — color-coded the moment a threshold breaks.</p>
+        <p>Today, weekly all-models, and Sonnet-only — percentage and bar, color-coded the moment a threshold breaks.</p>
       </div>
       <div class="feature reveal">
         <div class="visual">
@@ -528,18 +527,19 @@
         </div>
       </div>
       <div class="step reveal">
-        <h4>Helper polls quietly</h4>
-        <p>Every 60 seconds (configurable), the active profile's usage endpoints get pinged. Failures fall back to cached values.</p>
+        <h4>Live transcript scanning, no API calls</h4>
+        <p>A lightweight background daemon reads your local Claude Code <code class="mono">~/.claude/projects/</code> transcripts every 2 minutes. Byte-offset caching means incremental runs take ~100ms. The menubar updates within 500ms of any new token write via FSEvents.</p>
         <div class="frame" style="display:flex;align-items:center;justify-content:center;">
           <svg viewBox="0 0 200 120" width="100%" style="max-width:240px;">
-            <circle cx="40" cy="60" r="14" fill="white" stroke="var(--line)" stroke-width="1.5"/>
-            <text x="40" y="63" text-anchor="middle" font-size="11" fill="var(--ink-2)" font-family="ui-monospace,monospace">app</text>
-            <circle cx="160" cy="60" r="14" fill="white" stroke="var(--line)" stroke-width="1.5"/>
-            <text x="160" y="63" text-anchor="middle" font-size="9" fill="var(--ink-2)" font-family="ui-monospace,monospace">api</text>
-            <path d="M 55 55 Q 100 30 145 55" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3 3" id="pollPath1"/>
-            <path d="M 145 65 Q 100 90 55 65" fill="none" stroke="var(--ink-3)" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <rect x="10" y="46" width="60" height="28" rx="6" fill="white" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="40" y="58" text-anchor="middle" font-size="9" fill="var(--ink-2)" font-family="ui-monospace,monospace">.jsonl</text>
+            <text x="40" y="69" text-anchor="middle" font-size="8" fill="var(--ink-3)" font-family="ui-monospace,monospace">transcripts</text>
+            <rect x="130" y="46" width="60" height="28" rx="6" fill="white" stroke="var(--line)" stroke-width="1.5"/>
+            <text x="160" y="58" text-anchor="middle" font-size="9" fill="var(--ink-2)" font-family="ui-monospace,monospace">menubar</text>
+            <text x="160" y="69" text-anchor="middle" font-size="8" fill="var(--ink-3)" font-family="ui-monospace,monospace">daemon</text>
+            <path d="M 71 60 L 129 60" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3 3"/>
             <circle r="3" fill="var(--accent)">
-              <animateMotion dur="2.4s" repeatCount="indefinite" path="M 55 55 Q 100 30 145 55"/>
+              <animateMotion dur="1.8s" repeatCount="indefinite" path="M 71 60 L 129 60"/>
             </circle>
           </svg>
         </div>
@@ -842,7 +842,7 @@
   </div>
   <div class="wrap colophon">
     <span>Not affiliated with Anthropic.</span>
-    <span class="mono" style="margin-left:auto;">v0.1.1 · built <span id="build-date">&mdash;</span></span>
+    <span class="mono" style="margin-left:auto;">v0.3.0 · built <span id="build-date">&mdash;</span></span>
   </div>
 </footer>
 
