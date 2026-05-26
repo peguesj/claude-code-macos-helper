@@ -6,7 +6,7 @@ Workspace: `lgtm`
 Prefix: `CMH`
 
 ## Current version
-0.2.0 (CFBundleVersion 2), HEAD `3e14e7b`
+0.3.0 (CFBundleVersion 3), HEAD `604b1c6`, tag `v0.3.0`
 
 ## Build
 ```bash
@@ -16,11 +16,13 @@ make app                # release (universal arm64+x86_64)
 Always rebuild with `make app` then `open dist/ClaudeHelper.app` — never run the binary directly (NSStatusItem requires an .app bundle).
 
 ## Key files
-- `Sources/ClaudeHelper/Services/TelemetryService.swift` — polling + FSEvents watcher
+- `Sources/ClaudeHelper/Services/TelemetryService.swift` — FSEvents watcher + 60s fallback poll
 - `Sources/ClaudeHelper/Services/FileSystemWatcher.swift` — kqueue DispatchSource, debounce 500ms
-- `Sources/ClaudeHelper/Services/LocalSnapshotReader.swift` — reads `~/.claude/stats-cache.json`
+- `Sources/ClaudeHelper/Services/LocalSnapshotReader.swift` — reads `~/.claude/usage-live.json` (primary)
 - `Sources/ClaudeHelper/Services/KeychainHelper.swift` — Keychain access (see known issue below)
-- `Sources/ClaudeHelper/Models/Plan.swift` — per-plan token limits
+- `Sources/ClaudeHelper/Models/Plan.swift` — per-plan token limits (240M/130M for max20x)
+- `~/.claude/hooks/compute_usage_live.py` — LaunchAgent daemon; scans JSONL transcripts → usage-live.json
+- `~/Library/LaunchAgents/io.pegues.claudeusage.plist` — runs daemon every 120s
 - `scripts/generate_icon.py` — regenerate AppIcon PNGs (requires rsvg-convert)
 - `docs/appcast.xml` — Sparkle update feed (published to GitHub Pages)
 
@@ -58,7 +60,13 @@ Ad-hoc signing produces a new code signature each build. Keychain items auto-ACL
 - [x] **CMH-19**: Version bump 0.1.0 → 0.2.0
 - [x] **CMH-20**: UsageSnapshot hook bridge, stats-cache primary source, per-session snapshots
 
-### v0.3.0 — Next (not yet defined)
-- [ ] **CMH-X**: KeychainHelper → `kSecUseDataProtectionKeychain` + migration (fixes dev ACL prompts)
-- [ ] **CMH-X**: GitHub release v0.2.0 (sign zip, real appcast edSignature, tag)
-- [ ] **CMH-X**: Session meter % (requires 5h rate-window source — Admin API or delta heuristic)
+### v0.3.0 — Accurate JSONL telemetry (shipped `604b1c6`, tag `v0.3.0`)
+- [x] **CMH-21**: JSONL transcript daemon — `compute_usage_live.py` LaunchAgent, byte-offset cache, 100ms incremental
+- [x] **CMH-22**: Correct Tue–Mon calendar week window (was rolling 7-day); limits recalibrated 240M/130M for max20x
+- [x] **CMH-23**: Percentage labels on week meters (color-matched green/yellow/red)
+- [x] **CMH-24**: GitHub Pages v0.3.0 — updated lede, popover mock, "How it works" daemon diagram
+
+### v0.4.0 — Next
+- [ ] **CMH-X**: Strip AnthropicUsageClient + Keychain API key path (zero outbound HTTP, eliminates ATS surface and Keychain ACL prompts)
+- [ ] **CMH-X**: GitHub release v0.3.0 (sign zip, real appcast edSignature, tag on Releases page)
+- [ ] **CMH-X**: Session meter % (5h rate-window — delta heuristic from JSONL timestamps)
