@@ -55,30 +55,30 @@ struct Plan: Codable, Hashable {
         }
     }
 
-    // Approximate 7-day all-models rolling window token limit.
-    // Empirically: Max 20x observed 31% at 19.3M → ~63M. Max 5x and 20x share the
-    // same weekly cap; the plan multiplier scales the per-session rate, not the weekly quota.
+    // Approximate Tue-Mon calendar-week all-models token limit (input+output+cache_creation).
+    // Empirically re-derived 2026-05-26: Max 20x observed 9% at 21.4M → ~240M.
+    // Week resets Monday 11:59 PM (new week starts Tuesday 00:00).
     var approxWeekAllModelsLimit: Double {
         switch kind {
-        case .free:       return   6_000_000
-        case .pro:        return  12_600_000
-        case .max5x:      return  63_000_000
-        case .max20x:     return  63_000_000
-        case .team:       return  25_000_000
+        case .free:       return  24_000_000
+        case .pro:        return  48_000_000
+        case .max5x:      return 120_000_000
+        case .max20x:     return 240_000_000
+        case .team:       return  96_000_000
         case .enterprise: return           0
         }
     }
 
-    // Approximate 7-day Sonnet-model-only rolling window limit.
-    // Empirically: Max 20x observed 23% at 7.6M → ~33M.
+    // Approximate Tue-Mon calendar-week Sonnet-only token limit.
+    // Empirically re-derived 2026-05-26: Max 20x observed 10% at 13.1M → ~130M.
     var approxWeekSonnetLimit: Double {
         switch kind {
-        case .free:       return  2_000_000
-        case .pro:        return  4_200_000
-        case .max5x:      return 21_000_000
-        case .max20x:     return 33_000_000
-        case .team:       return  8_400_000
-        case .enterprise: return          0
+        case .free:       return  13_000_000
+        case .pro:        return  26_000_000
+        case .max5x:      return  65_000_000
+        case .max20x:     return 130_000_000
+        case .team:       return  52_000_000
+        case .enterprise: return           0
         }
     }
 }

@@ -44,7 +44,7 @@ enum LocalSnapshotReader {
                 limit: plan.approxWeekAllModelsLimit, resetsAt: weekResetDate
             ),
             sonnetOnly: TelemetryMeter(
-                label: "sonnet", used: 0,
+                label: "sonnet", used: Double(raw.week.sonnet),
                 limit: plan.approxWeekSonnetLimit, resetsAt: weekResetDate
             ),
             lastUpdated: raw.generatedAt
@@ -141,8 +141,8 @@ private struct UsageLive: Decodable {
     let today: DayTotals
     let week: WeekTotals
 
-    struct DayTotals:  Decodable { let date: String; let allModels: Int }
-    struct WeekTotals: Decodable { let startDate: String; let allModels: Int }
+    struct DayTotals:  Decodable { let date: String; let allModels: Int; let sonnet: Int }
+    struct WeekTotals: Decodable { let startDate: String; let allModels: Int; let sonnet: Int }
 
     init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
