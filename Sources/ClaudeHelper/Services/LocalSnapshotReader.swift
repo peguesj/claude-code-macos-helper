@@ -1,11 +1,12 @@
 import Foundation
 
-/// Reads token usage from ~/.claude/stats-cache.json — the authoritative source
-/// maintained by Claude Code for all sessions and models.
-/// "Session" meter = today's rolling usage (best per-file approximation of rate-limit window).
-/// "Week" meters = rolling 7-day window from the stats-cache.
-/// Falls back to per-session hook snapshots if stats-cache is absent or stale.
+/// Reads token usage from the best available local source.
+/// Priority: usage-live.json (daemon, ground truth) → stats-cache.json → hook snapshots.
+/// "Today" meter = tokens for today's calendar date.
+/// "Week" meters = rolling 7-day window.
 enum LocalSnapshotReader {
+    private static let usageLiveURL = URL(fileURLWithPath: NSHomeDirectory())
+        .appendingPathComponent(".claude/usage-live.json")
     private static let statsCacheURL = URL(fileURLWithPath: NSHomeDirectory())
         .appendingPathComponent(".claude/stats-cache.json")
     private static let snapshotsDir = URL(fileURLWithPath: NSHomeDirectory())
@@ -14,12 +15,43 @@ enum LocalSnapshotReader {
         .appendingPathComponent(".claude/usage-snapshot.json")
 
     static func read(plan: Plan) -> TelemetrySnapshot? {
+        if let snap = readFromLiveFile(plan: plan) { return snap }
         if let snap = readFromStatsCache(plan: plan) { return snap }
         if let snap = readFromDirectory(plan: plan) { return snap }
         return readFromLegacy(plan: plan)
     }
 
-    // MARK: - Stats-cache (primary)
+    // MARK: - usage-live.json (primary — daemon-computed from JSONL transcripts)
+
+    private static func readFromLiveFile(plan: Plan) -> TelemetrySnapshot? {
+        guard let data = try? Data(contentsOf: usageLiveURL),
+              let raw  = try? JSONDecoder().decode(UsageLive.self, from: data) else { return nil }
+
+        // Reject stale output: daemon must have run within the last 10 minutes
+        guard Date().timeIntervalSince(raw.generatedAt) < 600 else { return nil }
+
+        let cal   = Calendar(identifier: .gregorian)
+        let today = cal.startOfDay(for: Date())
+        let weekReset = cal.date(byAdding: .day, value: 1, to: today)
+        let weekResetDate = weekReset
+
+        return TelemetrySnapshot(
+            session: TelemetryMeter(
+                label: "today", used: Double(raw.today.allModels), limit: 0, resetsAt: weekResetDate
+            ),
+            allModels: TelemetryMeter(
+                label: "all-models", used: Double(raw.week.allModels),
+                limit: plan.approxWeekAllModelsLimit, resetsAt: weekResetDate
+            ),
+            sonnetOnly: TelemetryMeter(
+                label: "sonnet", used: 0,
+                limit: plan.approxWeekSonnetLimit, resetsAt: weekResetDate
+            ),
+            lastUpdated: raw.generatedAt
+        )
+    }
+
+    // MARK: - Stats-cache (secondary fallback)
 
     private static func readFromStatsCache(plan: Plan) -> TelemetrySnapshot? {
         guard let data = try? Data(contentsOf: statsCacheURL),
@@ -100,6 +132,26 @@ enum LocalSnapshotReader {
         guard Date().timeIntervalSince(raw.updatedAt) < 7200 else { return nil }
         return raw.toTelemetrySnapshot(plan: plan)
     }
+}
+
+// MARK: - usage-live.json Codable
+
+private struct UsageLive: Decodable {
+    let generatedAt: Date
+    let today: DayTotals
+    let week: WeekTotals
+
+    struct DayTotals:  Decodable { let date: String; let allModels: Int }
+    struct WeekTotals: Decodable { let startDate: String; let allModels: Int }
+
+    init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        today = try c.decode(DayTotals.self,  forKey: .today)
+        week  = try c.decode(WeekTotals.self, forKey: .week)
+        let iso = try c.decode(String.self,   forKey: .generatedAt)
+        generatedAt = ISO8601DateFormatter().date(from: iso) ?? .distantPast
+    }
+    enum CodingKeys: String, CodingKey { case generatedAt, today, week }
 }
 
 // MARK: - Stats-cache Codable

@@ -46,6 +46,7 @@ final class TelemetryService: ObservableObject {
             Task { await self?.refreshOnce() }
         }
         watcher.watch(paths: [
+            "\(home)/.claude/usage-live.json",
             "\(home)/.claude/stats-cache.json",
             "\(home)/.claude/usage-snapshots"
         ])
