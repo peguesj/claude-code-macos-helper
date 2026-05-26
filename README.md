@@ -58,14 +58,16 @@ Claude Helper lives in your menubar. It shows three live meters at all times, ho
 
 ## Features
 
-- **Three inline meters** — session / all-models / sonnet — visible at a glance next to a Claude C-arc icon.
+- **Three inline meters** — today / all-models (wk) / sonnet (wk) — visible at a glance next to a Claude C-arc icon. Week meters show `<used> / <limit>` with a colour-coded percentage badge (green / yellow / red).
+- **JSONL-based telemetry** — a lightweight Python daemon reads Claude Code's own transcript files (`~/.claude/projects/**/*.jsonl`) to produce accurate token counts. No API key required, no outbound HTTP. Incremental byte-offset scanning means re-reads are O(new bytes).
+- **Correct week window** — aggregates Tue 00:00 → Mon 23:59, matching claude.ai's quota reset cadence, not a rolling 7-day window.
 - **Multi-profile switcher** — Max personal, Team org, sandbox. Switching swaps the active API key, the claude.ai cookies, and the local `~/.claude/settings.json` profile atomically.
 - **Auto-bootstrap on first launch** — reads `~/.claude/settings.json`, then `ANTHROPIC_API_KEY`, then the macOS Keychain `Claude Code-credentials` (OAuth) item, creating a "Default" profile if any are present.
 - **Session capture & restore** — sign into claude.ai once per profile; subsequent switches restore cookies without re-auth via `WKWebsiteDataStore`.
 - **Spend ledger** — GRDB / SQLite store, daily aggregates, linear month-end forecast. UserNotifications alert when the projection crosses 80% of your monthly limit.
 - **Deep links** — buttons that open the right claude.ai settings page in your default browser, scoped to the active profile's session.
 - **Sparkle auto-updates** — EdDSA-signed appcast.
-- **AppleScript bridge** — automate profile switching from Shortcuts, Hammerspoon, shell scripts (`v0.1.1+`).
+- **AppleScript bridge** — automate profile switching from Shortcuts, Hammerspoon, shell scripts.
 - **No keychain reuse** — each profile's secrets live under their own service tag, scoped to the bundle ID + profile UUID.
 
 ## Screenshots
@@ -143,39 +145,49 @@ When you switch profiles:
 ## Architecture
 
 ```
-┌───────────────────────────────────────────────────────────────┐
-│ NSStatusItem (custom NSView, 22 pt tall)                      │
-│   ├── Claude C-arc icon (NSBezierPath, 16 pt)                 │
-│   └── 3 inline horizontal capsule meters (28×5 pt each)       │
-│        ▲                                                      │
-│        │ @Published TelemetrySnapshot                         │
-│ ┌──────┴─────────────────────────────────────────────┐        │
-│ │ NSPopover (SwiftUI content, 420×520 pt)            │        │
-│ │   Header • Tabs (Overview / Profiles / Limits /    │        │
-│ │           Spend / Settings) • Body                 │        │
-│ └─┬──────────────┬────────────┬────────────────────┬─┘        │
-│   │              │            │                    │          │
-│ ProfileStore  SpendLedger  DeepLinks         UpdaterBridge    │
-│  │ │ │       (GRDB)       (NSWorkspace)      (Sparkle 2.x)    │
-│  │ │ └── SessionStore (WKWebsiteDataStore per profile UUID)   │
-│  │ └──── CLIConfigWriter (~/.claude/settings.json atomic)     │
-│  └────── Keychain (one item per profile)                      │
-│  ▲                                                            │
-│ ProfileBootstrap (first-launch credential discovery)          │
-│                                                               │
-│ ┌─────────────────────────────────────────────────┐           │
-│ │ TelemetryService (actor, 60 s poll)             │           │
-│ │  AnthropicUsageClient                           │           │
-│ │    ├ /v1/organizations/usage_report/messages    │           │
-│ │    └ /v1/organizations/cost_report              │           │
-│ │  └→ writes samples to SpendLedger               │           │
-│ └─────────────────────────────────────────────────┘           │
-│ ┌─────────────────────────────────────────────────┐           │
-│ │ Forecaster — linear extrapolation,              │           │
-│ │  posts UNUserNotificationCenter alerts          │           │
-│ │  when projection crosses 0.5 → 0.8 → 1.0 limit  │           │
-│ └─────────────────────────────────────────────────┘           │
-└───────────────────────────────────────────────────────────────┘
+ LaunchAgent (120 s)
+  └─ compute_usage_live.py ──► ~/.claude/usage-live.json
+       reads ~/.claude/projects/**/*.jsonl                        ◄─── ground truth
+       byte-offset cache → only new bytes re-read                      token source
+       tracks all-models + sonnet separately
+       Tue–Mon calendar week window
+
+ ┌─────────────────────────────────────────────────┐
+ │ TelemetryService (@MainActor, 60 s fallback)    │
+ │  FileSystemWatcher (kqueue DispatchSource)      │
+ │   watches usage-live.json  ──► debounce 500 ms  │
+ │  LocalSnapshotReader.read(plan:)                │
+ │   1. usage-live.json  (daemon, < 10 min stale)  │
+ │   2. stats-cache.json (secondary fallback)      │
+ │   3. usage-snapshots/ (per-session fallback)    │
+ │   └→ @Published TelemetrySnapshot               │
+ └─────────────┬───────────────────────────────────┘
+               ▼
+┌──────────────────────────────────────────────────────────────┐
+│ NSStatusItem (custom NSView, 22 pt tall)                     │
+│   ├── Claude C-arc icon (NSBezierPath, 16 pt)                │
+│   └── 3 inline horizontal capsule meters (28×5 pt each)      │
+│                                                              │
+│ ┌──────────────────────────────────────────────────────┐     │
+│ │ NSPopover (SwiftUI content, 420×520 pt)              │     │
+│ │   Header • Tabs (Overview / Profiles / Limits /      │     │
+│ │           Spend / Settings) • Body                   │     │
+│ └─┬──────────────┬────────────┬──────────────────────┬─┘     │
+│   │              │            │                      │       │
+│ ProfileStore  SpendLedger  DeepLinks           UpdaterBridge  │
+│  │ │ │       (GRDB)       (NSWorkspace)        (Sparkle 2.x) │
+│  │ │ └── SessionStore (WKWebsiteDataStore per profile UUID)  │
+│  │ └──── CLIConfigWriter (~/.claude/settings.json atomic)    │
+│  └────── Keychain (one item per profile)                     │
+│  ▲                                                           │
+│ ProfileBootstrap (first-launch credential discovery)         │
+│                                                              │
+│ ┌──────────────────────────────────────────────────┐         │
+│ │ Forecaster — linear extrapolation,               │         │
+│ │  posts UNUserNotificationCenter alerts           │         │
+│ │  when projection crosses 0.5 → 0.8 → 1.0 limit  │         │
+│ └──────────────────────────────────────────────────┘         │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 The entire app is **one SPM executable target** packaged into a `.app` bundle by `scripts/build-app.sh`. No `.xcodeproj` is checked in — open with `xed .` if you want Xcode tooling.
@@ -228,8 +240,10 @@ claude-code-macos-helper/
 │   │   ├── Plan.swift                  # Plan.Kind enum
 │   │   └── Profile.swift               # Profile struct + NSColor(hex:)
 │   ├── Services/
-│   │   ├── TelemetryService.swift      # @MainActor, 60s poll
-│   │   ├── AnthropicUsageClient.swift  # actor, URLSession + stub fallback
+│   │   ├── TelemetryService.swift      # @MainActor, 60s fallback poll + FSEvents
+│   │   ├── LocalSnapshotReader.swift   # usage-live.json → stats-cache → snapshots
+│   │   ├── FileSystemWatcher.swift     # kqueue DispatchSource, 500ms debounce
+│   │   ├── AnthropicUsageClient.swift  # actor, URLSession (optional / fallback)
 │   │   ├── KeychainHelper.swift        # generic-password CRUD
 │   │   ├── ProfileStore.swift          # ObservableObject, persistence
 │   │   ├── ProfileBootstrap.swift      # first-launch credential discovery
@@ -248,7 +262,12 @@ claude-code-macos-helper/
 ├── Tests/ClaudeHelperTests/            # XCTest suite (ratio math, hex, deep-links)
 ├── scripts/
 │   ├── build-app.sh                    # SPM build → .app bundle + Sparkle.framework
+│   ├── generate_icon.py                # regenerate AppIcon PNGs (requires rsvg-convert)
 │   └── release.sh                      # tag + gh release with artifact
+├── ~/.claude/hooks/
+│   └── compute_usage_live.py           # JSONL daemon (not in repo; installed at first run)
+├── ~/Library/LaunchAgents/
+│   └── io.pegues.claudeusage.plist     # runs daemon every 120 s
 ├── docs/                               # GitHub Pages root
 │   ├── index.html                      # marketing site (from design handoff)
 │   ├── assets/colors_and_type.css      # shared design tokens
@@ -275,17 +294,14 @@ The `develop/browser-automation` branch is parked as the alternative to deep-lin
 
 ## Roadmap
 
-| Wave | Status | Stories |
+| Version | Status | Highlights |
 |---|---|---|
-| 1 — Foundation | ✅ | CMH-1 … CMH-4 |
-| 2 — Menubar shell | ✅ | CMH-5 … CMH-8 |
-| 3 — Profile system | ✅ | CMH-9 … CMH-12 |
-| 4 — Settings + spend | ✅ | CMH-13 … CMH-16 |
-| 5 — Polish + ship | ✅ | CMH-17 … CMH-20 |
-| 6 — Bootstrap + brand | ✅ | CMH-21 … CMH-25 |
-| 7 — AppleScript + Notarization | ⏳ | post-v0.1.1 |
+| v0.1.0 — Foundation | ✅ | SPM scaffold, menubar meters, profiles, spend ledger, Sparkle |
+| v0.2.0 — Live telemetry | ✅ | FSEvents watcher, AppIcon, corrected limits, stats-cache primary |
+| v0.3.0 — Accurate JSONL telemetry | ✅ | JSONL daemon, Tue–Mon week window, 240M/130M limits, % badges |
+| v0.4.0 — Zero outbound HTTP | ⏳ | Strip `AnthropicUsageClient` + Keychain API-key path; session meter %; signed GitHub release |
 
-Next priorities: AppleScript scripting bridge, optional notarization path if a sponsor provides a Dev ID, sandbox-friendly entitlement set.
+Next: removing the `AnthropicUsageClient` makes the app fully local — no outbound HTTP, no ATS surface, and no Keychain ACL prompts on dev builds. Session meter percentage via JSONL timestamp delta heuristic (5 h rate-window) is also planned.
 
 ## License
 

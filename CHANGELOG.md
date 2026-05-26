@@ -4,6 +4,20 @@ All notable changes to Claude Helper are documented in this file. Format follows
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-05-26
+
+### Added
+- **JSONL transcript daemon** (`~/.claude/hooks/compute_usage_live.py`) — reads Claude Code transcript files directly from `~/.claude/projects/**/*.jsonl` to produce authoritative token counts. Byte-offset cache (`usage-live-cache.json`) makes incremental re-scans O(new bytes), not O(all history). Runs every 120 s via `~/Library/LaunchAgents/io.pegues.claudeusage.plist`. Outputs `~/.claude/usage-live.json` — the new primary data source for the menubar app.
+- **Sonnet-only token tracking** — daemon parses the `message.model` field from each assistant turn and accumulates a separate Sonnet counter alongside the all-models total.
+- **Percentage labels on week meters** — each week meter now shows `<used> / <limit>` plus a colour-coded percentage badge: green < 50 %, yellow 50–79 %, red ≥ 80 %.
+
+### Changed
+- **Correct Tue–Mon calendar week window** — week aggregation now uses the most recent Tuesday as the epoch (matching claude.ai's "Resets Mon 11:59 PM" display). Previously used a rolling 7-day window that diverged from actual quota resets.
+- **Recalibrated token limits for Max 20x** — empirically derived from live claude.ai readings on 2026-05-26 (9 % at 21.4 M all-models; 10 % at 13.1 M Sonnet): all-models 240 M (was 63 M), Sonnet 130 M (was 33 M). Max 5×, Pro, and Free limits scaled proportionally.
+- **`usage-live.json` as primary data source** — `LocalSnapshotReader` now tries the daemon output first; `stats-cache.json` and per-session snapshots remain as ordered fallbacks. Daemon output is rejected if older than 10 minutes.
+- **FSEvents watcher extended** — `TelemetryService` now watches `~/.claude/usage-live.json` in addition to `stats-cache.json` and the snapshots directory; meters update within 500 ms of any daemon write.
+- **GitHub Pages** — hero lede updated to emphasise local JSONL reading, popover mock reflects `(wk)` labels and percentage display, "How it works" diagram shows daemon pipeline.
+
 ## [0.2.0] — 2026-05-21
 
 ### Added
