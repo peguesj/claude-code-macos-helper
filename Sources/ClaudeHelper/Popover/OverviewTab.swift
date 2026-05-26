@@ -8,8 +8,8 @@ struct OverviewTab: View {
         VStack(alignment: .leading, spacing: 14) {
             sectionTitle("Current usage")
             meterRow(label: "Today", meter: telemetry.snapshot.session)
-            meterRow(label: "All models (7d)", meter: telemetry.snapshot.allModels)
-            meterRow(label: "Sonnet (7d)", meter: telemetry.snapshot.sonnetOnly)
+            meterRow(label: "All models (wk)", meter: telemetry.snapshot.allModels)
+            meterRow(label: "Sonnet (wk)", meter: telemetry.snapshot.sonnetOnly)
 
             Divider().padding(.vertical, 4)
 
@@ -52,9 +52,14 @@ struct OverviewTab: View {
                 Spacer()
                 VStack(alignment: .trailing, spacing: 1) {
                     if meter.limit > 0 {
-                        Text("\(Forecaster.compact(meter.used)) / \(Forecaster.compact(meter.limit))")
-                            .font(.system(size: 11, design: .monospaced))
-                            .foregroundStyle(.secondary)
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text("\(Forecaster.compact(meter.used)) / \(Forecaster.compact(meter.limit))")
+                                .font(.system(size: 11, design: .monospaced))
+                                .foregroundStyle(.secondary)
+                            Text(String(format: "%.0f%%", meter.ratio * 100))
+                                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                .foregroundStyle(meterColor(meter.ratio))
+                        }
                     } else {
                         Text(Forecaster.compact(meter.used))
                             .font(.system(size: 11, design: .monospaced))
@@ -68,7 +73,7 @@ struct OverviewTab: View {
                 }
             }
             if meter.limit > 0 {
-                ProgressView(value: meter.ratio)
+                ProgressView(value: min(meter.ratio, 1.0))
                     .progressViewStyle(.linear)
                     .tint(meterColor(meter.ratio))
             }
