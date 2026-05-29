@@ -6,7 +6,7 @@ Workspace: `lgtm`
 Prefix: `CMH`
 
 ## Current version
-0.3.0 (CFBundleVersion 3), HEAD `604b1c6`, tag `v0.3.0`
+0.3.0 (CFBundleVersion 3), HEAD `71c18fc`, tag `v0.3.0`
 
 ## Build
 ```bash
@@ -65,6 +65,10 @@ Ad-hoc signing produces a new code signature each build. Keychain items auto-ACL
 - [x] **CMH-22**: Correct Tue–Mon calendar week window (was rolling 7-day); limits recalibrated 240M/130M for max20x
 - [x] **CMH-23**: Percentage labels on week meters (color-matched green/yellow/red)
 - [x] **CMH-24**: GitHub Pages v0.3.0 — updated lede, popover mock, "How it works" daemon diagram
+
+### v0.3.0+ — Post-ship telemetry fixes (2026-05-29)
+- [x] **CMH-25**: Session meter — current conversation token count from most-recent JSONL file; no limit bar (raw count); daemon outputs `session` field
+- [x] **CMH-26**: Recalibrate Max 20x limits to 420M all-models / 230M sonnet (mid-week empirical; previous 240M/130M had high error from day-1 data); meter order Session → Sonnet → All models
 
 ### v0.4.0 — Next
 - [ ] **CMH-X**: Strip AnthropicUsageClient + Keychain API key path (zero outbound HTTP, eliminates ATS surface and Keychain ACL prompts)
