@@ -56,28 +56,28 @@ struct Plan: Codable, Hashable {
     }
 
     // Approximate Tue-Mon calendar-week all-models token limit (input+output+cache_creation).
-    // Empirically re-derived 2026-05-26: Max 20x observed 9% at 21.4M → ~240M.
+    // Empirically re-derived 2026-05-29: Max 20x observed 46% at 192.2M → ~420M.
     // Week resets Monday 11:59 PM (new week starts Tuesday 00:00).
     var approxWeekAllModelsLimit: Double {
         switch kind {
-        case .free:       return  24_000_000
-        case .pro:        return  48_000_000
-        case .max5x:      return 120_000_000
-        case .max20x:     return 240_000_000
-        case .team:       return  96_000_000
+        case .free:       return  42_000_000
+        case .pro:        return  84_000_000
+        case .max5x:      return 210_000_000
+        case .max20x:     return 420_000_000
+        case .team:       return 168_000_000
         case .enterprise: return           0
         }
     }
 
     // Approximate Tue-Mon calendar-week Sonnet-only token limit.
-    // Empirically re-derived 2026-05-26: Max 20x observed 10% at 13.1M → ~130M.
+    // Empirically re-derived 2026-05-29: Max 20x observed 47% at 108.3M → ~230M.
     var approxWeekSonnetLimit: Double {
         switch kind {
-        case .free:       return  13_000_000
-        case .pro:        return  26_000_000
-        case .max5x:      return  65_000_000
-        case .max20x:     return 130_000_000
-        case .team:       return  52_000_000
+        case .free:       return  23_000_000
+        case .pro:        return  46_000_000
+        case .max5x:      return 115_000_000
+        case .max20x:     return 230_000_000
+        case .team:       return  92_000_000
         case .enterprise: return           0
         }
     }

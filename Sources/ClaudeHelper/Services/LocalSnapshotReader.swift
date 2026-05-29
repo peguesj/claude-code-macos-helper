@@ -32,12 +32,11 @@ enum LocalSnapshotReader {
 
         let cal   = Calendar(identifier: .gregorian)
         let today = cal.startOfDay(for: Date())
-        let weekReset = cal.date(byAdding: .day, value: 1, to: today)
-        let weekResetDate = weekReset
+        let weekResetDate = cal.date(byAdding: .day, value: 1, to: today)
 
         return TelemetrySnapshot(
             session: TelemetryMeter(
-                label: "today", used: Double(raw.today.allModels), limit: 0, resetsAt: weekResetDate
+                label: "session", used: Double(raw.session.allModels), limit: 0, resetsAt: nil
             ),
             allModels: TelemetryMeter(
                 label: "all-models", used: Double(raw.week.allModels),
@@ -138,20 +137,23 @@ enum LocalSnapshotReader {
 
 private struct UsageLive: Decodable {
     let generatedAt: Date
+    let session: SessionTotals
     let today: DayTotals
     let week: WeekTotals
 
-    struct DayTotals:  Decodable { let date: String; let allModels: Int; let sonnet: Int }
-    struct WeekTotals: Decodable { let startDate: String; let allModels: Int; let sonnet: Int }
+    struct SessionTotals: Decodable { let allModels: Int; let sonnet: Int }
+    struct DayTotals:     Decodable { let date: String; let allModels: Int; let sonnet: Int }
+    struct WeekTotals:    Decodable { let startDate: String; let allModels: Int; let sonnet: Int }
 
     init(from decoder: any Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        today = try c.decode(DayTotals.self,  forKey: .today)
-        week  = try c.decode(WeekTotals.self, forKey: .week)
-        let iso = try c.decode(String.self,   forKey: .generatedAt)
+        session = try c.decode(SessionTotals.self, forKey: .session)
+        today   = try c.decode(DayTotals.self,     forKey: .today)
+        week    = try c.decode(WeekTotals.self,    forKey: .week)
+        let iso = try c.decode(String.self,        forKey: .generatedAt)
         generatedAt = ISO8601DateFormatter().date(from: iso) ?? .distantPast
     }
-    enum CodingKeys: String, CodingKey { case generatedAt, today, week }
+    enum CodingKeys: String, CodingKey { case generatedAt, session, today, week }
 }
 
 // MARK: - Stats-cache Codable

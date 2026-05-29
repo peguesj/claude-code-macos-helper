@@ -7,9 +7,9 @@ struct OverviewTab: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             sectionTitle("Current usage")
-            meterRow(label: "Today", meter: telemetry.snapshot.session)
-            meterRow(label: "All models (wk)", meter: telemetry.snapshot.allModels)
+            meterRow(label: "Session", meter: telemetry.snapshot.session)
             meterRow(label: "Sonnet (wk)", meter: telemetry.snapshot.sonnetOnly)
+            meterRow(label: "All models (wk)", meter: telemetry.snapshot.allModels)
 
             Divider().padding(.vertical, 4)
 
